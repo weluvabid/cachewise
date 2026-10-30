@@ -172,6 +172,9 @@ importers:
 
   apps/demo:
     dependencies:
+      cachewise:
+        specifier: workspace:*
+        version: link:../../packages/cachewise
       '@weluvabid/iris':
         specifier: ^0.1.2
         version: 0.1.2

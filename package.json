@@ -7,7 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "pnpm --filter cachewise build",
+    "build": "pnpm --filter cachewise build && pnpm --filter @cachewise/demo build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -43,7 +43,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs,svelte,json,md,yml,yaml,css}": "prettier --write",
-    "*.{ts,tsx,js,mjs,cjs}": "eslint --fix"
+    "*.{ts,tsx,js,mjs,cjs,svelte}": "eslint --fix"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged"
