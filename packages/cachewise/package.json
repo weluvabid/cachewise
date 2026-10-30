@@ -1,0 +1,30 @@
+{
+  "name": "cachewise",
+  "version": "0.1.0",
+  "description": "Computation-aware caching under a predictable memory budget.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=24"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "check:package": "publint --strict && attw --pack . --profile esm-only",
+    "benchmark": "pnpm build && node benchmarks/run.mjs"
+  }
+}

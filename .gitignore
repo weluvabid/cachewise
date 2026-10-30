@@ -2,6 +2,7 @@ node_modules/
 dist/
 coverage/
 .svelte-kit/
+.idea/
 build/
 .env
 .env.*
