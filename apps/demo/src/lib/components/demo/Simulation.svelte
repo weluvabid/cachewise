@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { Pause, Play, RotateCcw, SkipForward } from '@lucide/svelte';
-  import { Button } from '$lib/components/ui/button';
+  import { Pause, Play, RotateCcw, StepForward } from '@lucide/svelte';
   import { Badge } from '$lib/components/ui/badge';
   import * as Tooltip from '$lib/components/ui/tooltip';
   import WorkloadCard from './WorkloadCard.svelte';
@@ -100,56 +99,42 @@
   <RunSummary {runs} {scenarioIds} labels={scenarioLabels} />
 
   <Tooltip.Provider delayDuration={250}>
-    <div
-      class="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border/70 bg-background/75 p-2 shadow-xl shadow-black/10 backdrop-blur-xl supports-[backdrop-filter]:bg-background/65"
+    <nav
+      class="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border/80 bg-background/90 p-2 shadow-xl shadow-black/10 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
       aria-label="Simulation playback controls"
     >
       <Tooltip.Root>
-        <Tooltip.Trigger>
-          <Button
-            variant="outline"
-            size="icon"
-            class="rounded-full border-transparent bg-transparent shadow-none hover:bg-muted"
-            onclick={reset}
-            aria-label="Reset all simulations"
-          >
-            <RotateCcw size={16} />
-          </Button>
+        <Tooltip.Trigger
+          class="inline-flex size-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          onclick={reset}
+          aria-label="Reset all simulations"
+        >
+          <RotateCcw size={16} aria-hidden="true" />
         </Tooltip.Trigger>
         <Tooltip.Content>Reset all simulations</Tooltip.Content>
       </Tooltip.Root>
 
       <Tooltip.Root>
-        <Tooltip.Trigger>
-          <Button
-            variant={playing ? 'outline' : 'default'}
-            size="icon"
-            class={playing
-              ? 'rounded-full border-amber-500/40 bg-amber-500/10 text-amber-600 shadow-none hover:bg-amber-500/20 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-400'
-              : 'rounded-full shadow-sm'}
-            onclick={togglePlayback}
-            aria-label={playbackLabel}
-          >
-            {#if playing}<Pause size={16} />{:else}<Play size={16} />{/if}
-          </Button>
+        <Tooltip.Trigger
+          class={playing
+            ? 'inline-flex size-9 items-center justify-center rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-600 transition-colors hover:bg-amber-500/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:text-amber-400'
+            : 'inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-colors hover:bg-primary/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'}
+          onclick={togglePlayback}
+          aria-label={playbackLabel}
+        >
+          {#if playing}<Pause size={16} aria-hidden="true" />{:else}<Play size={16} aria-hidden="true" />{/if}
         </Tooltip.Trigger>
         <Tooltip.Content>{playbackLabel}</Tooltip.Content>
       </Tooltip.Root>
 
       <Tooltip.Root>
-        <Tooltip.Trigger>
-          <span class="inline-flex">
-            <Button
-              variant="outline"
-              size="icon"
-              class="rounded-full border-transparent bg-transparent shadow-none hover:bg-muted disabled:pointer-events-auto disabled:cursor-not-allowed"
-              onclick={stepAll}
-              disabled={allComplete || playing}
-              aria-label="Step forward"
-            >
-              <SkipForward size={16} />
-            </Button>
-          </span>
+        <Tooltip.Trigger
+          class="inline-flex size-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-45"
+          onclick={stepAll}
+          disabled={allComplete || playing}
+          aria-label="Step forward"
+        >
+          <StepForward size={16} aria-hidden="true" />
         </Tooltip.Trigger>
         <Tooltip.Content
           >{playing
@@ -159,6 +144,6 @@
               : 'Step forward'}</Tooltip.Content
         >
       </Tooltip.Root>
-    </div>
+    </nav>
   </Tooltip.Provider>
 </div>

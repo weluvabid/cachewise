@@ -43,12 +43,11 @@
             <div class="flex min-w-0 items-center gap-1.5">
               <h3 class="font-semibold">{definitions[id].label}</h3>
               <Tooltip.Root>
-                <Tooltip.Trigger>
-                  <Info
-                    size={14}
-                    class="text-muted-foreground"
-                    aria-label={`About ${definitions[id].label}`}
-                  />
+                <Tooltip.Trigger
+                  class="inline-flex size-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring"
+                  aria-label={`About ${definitions[id].label}`}
+                >
+                  <Info size={14} aria-hidden="true" />
                 </Tooltip.Trigger>
                 <Tooltip.Content>{definitions[id].description}</Tooltip.Content>
               </Tooltip.Root>
@@ -61,7 +60,7 @@
             <span class="text-muted-foreground">Memory used</span>
             <span class="font-medium tabular-nums">{bytesUsed} / {capacity} KB</span>
           </div>
-          <Progress value={bytesUsed} max={capacity} />
+          <Progress value={bytesUsed} max={capacity} aria-label={`${title} ${definitions[id].label} memory usage`} />
           <p class="text-xs text-muted-foreground">
             Resident entries: <span class="font-medium text-foreground">{entryCount ?? 0}</span>
           </p>

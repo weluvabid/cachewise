@@ -29,12 +29,11 @@
         <Card.Title>Run summary</Card.Title>
         <span class="ml-auto">
           <Tooltip.Root>
-            <Tooltip.Trigger>
-              <Info
-                size={15}
-                class="text-muted-foreground"
-                aria-label={`Simulation status: ${status}`}
-              />
+            <Tooltip.Trigger
+              class="inline-flex size-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring"
+              aria-label={`Simulation status: ${status}`}
+            >
+              <Info size={15} aria-hidden="true" />
             </Tooltip.Trigger>
             <Tooltip.Content
               >Simulation status: {status}. Metrics update as the three deterministic workloads
@@ -102,12 +101,13 @@
         <h3 class="font-semibold">Workload breakdown</h3>
         <div class="overflow-x-auto">
           <Table.Root>
+            <caption class="sr-only">Hit rate and recomputation cost by workload for each caching policy.</caption>
             <Table.Header>
               <Table.Row>
-                <Table.Head>Workload</Table.Head>
-                <Table.Head class="text-right">LRU hit rate</Table.Head>
-                <Table.Head class="text-right">Cachewise hit rate</Table.Head>
-                <Table.Head class="text-right">Cost reduction</Table.Head>
+                <Table.Head scope="col">Workload</Table.Head>
+                <Table.Head scope="col" class="text-right">LRU hit rate</Table.Head>
+                <Table.Head scope="col" class="text-right">Cachewise hit rate</Table.Head>
+                <Table.Head scope="col" class="text-right">Cost reduction</Table.Head>
               </Table.Row>
             </Table.Header>
             <Table.Body>
