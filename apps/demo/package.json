@@ -11,9 +11,10 @@
     "typecheck": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
+    "@icons-pack/svelte-simple-icons": "^7.2.0",
     "@weluvabid/iris": "^0.1.2",
-    "svelte": "^5.38.0",
-    "cachewise": "workspace:*"
+    "cachewise": "workspace:*",
+    "svelte": "^5.38.0"
   },
   "devDependencies": {
     "@lucide/svelte": "^1.64.0",

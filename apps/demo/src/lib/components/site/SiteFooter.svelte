@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { ArrowUpRight } from '@lucide/svelte';
+  import { SiGithub } from '@icons-pack/svelte-simple-icons';
+  import { FileText, BookX } from '@lucide/svelte';
 </script>
 
 <footer
@@ -7,14 +8,18 @@
 >
   <span class="font-semibold text-foreground">cachewise</span>
   <nav class="flex gap-4" aria-label="Project resources">
-    <a href="https://github.com/weluvabid/cachewise" target="_blank" rel="noreferrer"
-      >GitHub <ArrowUpRight size={12} /></a
+    <a href="https://github.com/weluvabid/cachewise" target="_blank" rel="noreferrer">
+      <SiGithub size={20} />
+    </a>
+    <a
+      href="https://github.com/weluvabid/cachewise/tree/main/docs"
+      target="_blank"
+      rel="noreferrer"
     >
-    <a href="https://github.com/weluvabid/cachewise/tree/main/docs" target="_blank" rel="noreferrer"
-      >Docs <ArrowUpRight size={12} /></a
-    >
-    <a href="https://github.com/weluvabid/cachewise/issues" target="_blank" rel="noreferrer"
-      >Issues <ArrowUpRight size={12} /></a
-    >
+      <FileText size={20} />
+    </a>
+    <a href="https://github.com/weluvabid/cachewise/issues" target="_blank" rel="noreferrer">
+      <BookX size={20} />
+    </a>
   </nav>
 </footer>
