@@ -101,13 +101,15 @@
         <h3 class="font-semibold">Workload breakdown</h3>
         <div class="overflow-x-auto">
           <Table.Root>
-            <caption class="sr-only">Hit rate and recomputation cost by workload for each caching policy.</caption>
+            <caption class="sr-only"
+              >Hit rate and recomputation cost by workload for each caching policy.</caption
+            >
             <Table.Header>
               <Table.Row>
-                <Table.Head scope="col">Workload</Table.Head>
-                <Table.Head scope="col" class="text-right">LRU hit rate</Table.Head>
-                <Table.Head scope="col" class="text-right">Cachewise hit rate</Table.Head>
-                <Table.Head scope="col" class="text-right">Cost reduction</Table.Head>
+                <Table.Head>Workload</Table.Head>
+                <Table.Head class="text-right">LRU hit rate</Table.Head>
+                <Table.Head class="text-right">Cachewise hit rate</Table.Head>
+                <Table.Head class="text-right">Cost reduction</Table.Head>
               </Table.Row>
             </Table.Header>
             <Table.Body>

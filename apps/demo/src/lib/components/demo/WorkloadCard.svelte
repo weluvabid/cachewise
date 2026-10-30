@@ -60,7 +60,11 @@
             <span class="text-muted-foreground">Memory used</span>
             <span class="font-medium tabular-nums">{bytesUsed} / {capacity} KB</span>
           </div>
-          <Progress value={bytesUsed} max={capacity} aria-label={`${title} ${definitions[id].label} memory usage`} />
+          <Progress
+            value={bytesUsed}
+            max={capacity}
+            aria-label={`${title} ${definitions[id].label} memory usage`}
+          />
           <p class="text-xs text-muted-foreground">
             Resident entries: <span class="font-medium text-foreground">{entryCount ?? 0}</span>
           </p>

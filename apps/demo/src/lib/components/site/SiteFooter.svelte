@@ -15,7 +15,7 @@
       rel="noopener noreferrer"
       aria-label="Cachewise source code on GitHub (opens in a new tab)"
       title="Source code"
-      >
+    >
       <SiGithub size={19} aria-hidden="true" />
     </a>
     <a
@@ -25,7 +25,7 @@
       rel="noopener noreferrer"
       aria-label="Cachewise documentation (opens in a new tab)"
       title="Documentation"
-      >
+    >
       <BookOpenText size={19} aria-hidden="true" />
     </a>
     <a
@@ -35,7 +35,7 @@
       rel="noopener noreferrer"
       aria-label="Report an issue on GitHub (opens in a new tab)"
       title="Report an issue"
-      >
+    >
       <CircleHelp size={19} aria-hidden="true" />
     </a>
   </nav>

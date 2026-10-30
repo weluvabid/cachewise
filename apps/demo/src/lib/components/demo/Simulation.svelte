@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-  import { Pause, Play, RotateCcw, StepForward } from '@lucide/svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import { Keyboard, Pause, Play, RotateCcw, StepForward } from '@lucide/svelte';
   import { Badge } from '$lib/components/ui/badge';
   import * as Tooltip from '$lib/components/ui/tooltip';
+  import * as Dialog from '$lib/components/ui/dialog';
+  import { Separator } from '$lib/components/ui/separator';
   import WorkloadCard from './WorkloadCard.svelte';
   import RunSummary from './RunSummary.svelte';
   import { buildSnapshots } from '$lib/simulation/engine';
@@ -30,6 +32,7 @@
 
   let runs = $state(createRuns());
   let playing = $state(false);
+  let shortcutsOpen = $state(false);
   let timer: ReturnType<typeof setInterval> | undefined;
 
   let allComplete = $derived(scenarioIds.every((id) => runs[id].step >= runs[id].snapshots.length));
@@ -78,6 +81,50 @@
     advance();
   }
 
+  function handleKeydown(event: KeyboardEvent): void {
+    if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.repeat) {
+      return;
+    }
+
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const isInteractive = target.closest(
+      'input, textarea, select, button, a, summary, [contenteditable="true"], [role="button"], [role="textbox"]',
+    );
+    if (isInteractive) return;
+
+    if (shortcutsOpen) return;
+
+    if (event.key === '?') {
+      event.preventDefault();
+      shortcutsOpen = true;
+      return;
+    }
+
+    if (event.shiftKey) return;
+
+    switch (event.code) {
+      case 'Space':
+        event.preventDefault();
+        togglePlayback();
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        if (!playing && !allComplete) stepAll();
+        break;
+      case 'KeyR':
+        event.preventDefault();
+        reset();
+        break;
+    }
+  }
+
+  onMount(() => {
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  });
+
   onDestroy(stop);
 </script>
 
@@ -111,7 +158,7 @@
         >
           <RotateCcw size={16} aria-hidden="true" />
         </Tooltip.Trigger>
-        <Tooltip.Content>Reset all simulations</Tooltip.Content>
+        <Tooltip.Content>Reset all simulations · R</Tooltip.Content>
       </Tooltip.Root>
 
       <Tooltip.Root>
@@ -122,9 +169,12 @@
           onclick={togglePlayback}
           aria-label={playbackLabel}
         >
-          {#if playing}<Pause size={16} aria-hidden="true" />{:else}<Play size={16} aria-hidden="true" />{/if}
+          {#if playing}<Pause size={16} aria-hidden="true" />{:else}<Play
+              size={16}
+              aria-hidden="true"
+            />{/if}
         </Tooltip.Trigger>
-        <Tooltip.Content>{playbackLabel}</Tooltip.Content>
+        <Tooltip.Content>{playbackLabel} · Space</Tooltip.Content>
       </Tooltip.Root>
 
       <Tooltip.Root>
@@ -141,9 +191,82 @@
             ? 'Pause playback to step manually'
             : allComplete
               ? 'Simulation complete'
-              : 'Step forward'}</Tooltip.Content
+              : 'Step forward · →'}</Tooltip.Content
         >
       </Tooltip.Root>
+
+      <div class="mx-0.5 h-5 w-px bg-border" aria-hidden="true"></div>
+
+      <Dialog.Root bind:open={shortcutsOpen}>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            class="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            onclick={() => (shortcutsOpen = true)}
+            aria-label="Show keyboard shortcuts"
+          >
+            <Keyboard size={16} aria-hidden="true" />
+          </Tooltip.Trigger>
+          <Tooltip.Content>Keyboard shortcuts (?)</Tooltip.Content>
+        </Tooltip.Root>
+
+        <Dialog.Content class="gap-5 sm:max-w-sm">
+          <Dialog.Header>
+            <Dialog.Title class="text-base">Keyboard shortcuts</Dialog.Title>
+            <Dialog.Description>
+              Control the Cachewise simulation without reaching for the playback dock.
+            </Dialog.Description>
+          </Dialog.Header>
+
+          <div class="space-y-3">
+            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Playback
+            </p>
+            <div class="flex items-center justify-between gap-4">
+              <span>Play / pause</span>
+              <kbd
+                class="min-w-16 rounded-md border border-border bg-muted px-2 py-1 text-center font-mono text-xs text-foreground shadow-sm"
+                >Space</kbd
+              >
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <span>Step forward</span>
+              <kbd
+                class="min-w-16 rounded-md border border-border bg-muted px-2 py-1 text-center font-mono text-xs text-foreground shadow-sm"
+                >→</kbd
+              >
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <span>Reset simulation</span>
+              <kbd
+                class="min-w-16 rounded-md border border-border bg-muted px-2 py-1 text-center font-mono text-xs text-foreground shadow-sm"
+                >R</kbd
+              >
+            </div>
+          </div>
+
+          <Separator />
+
+          <div class="space-y-3">
+            <p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              General
+            </p>
+            <div class="flex items-center justify-between gap-4">
+              <span>Show shortcuts</span>
+              <kbd
+                class="min-w-16 rounded-md border border-border bg-muted px-2 py-1 text-center font-mono text-xs text-foreground shadow-sm"
+                >?</kbd
+              >
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <span>Close dialog</span>
+              <kbd
+                class="min-w-16 rounded-md border border-border bg-muted px-2 py-1 text-center font-mono text-xs text-foreground shadow-sm"
+                >Esc</kbd
+              >
+            </div>
+          </div>
+        </Dialog.Content>
+      </Dialog.Root>
     </nav>
   </Tooltip.Provider>
 </div>
