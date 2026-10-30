@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  base: process.env.GITHUB_ACTIONS ? '/cachewise/' : '/',
   plugins: [tailwindcss(), svelte()],
   build: {
     target: 'es2022',
