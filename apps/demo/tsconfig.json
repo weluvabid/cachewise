@@ -13,30 +13,14 @@
     "moduleResolution": "bundler",
     "module": "ESNext",
     "target": "ESNext",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "types": [
-      "svelte"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["svelte"],
     "baseUrl": ".",
     "paths": {
-      "$lib": [
-        "./src/lib"
-      ],
-      "$lib/*": [
-        "./src/lib/*"
-      ],
-      "cachewise": [
-        "../../packages/cachewise/src/index.ts"
-      ]
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"],
+      "cachewise": ["../../packages/cachewise/src/index.ts"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.svelte",
-    "vite.config.ts"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.svelte", "vite.config.ts"]
 }

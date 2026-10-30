@@ -28,13 +28,20 @@
     } catch {
       // Fall back to the operating-system preference.
     }
-    applyTheme(preference ? preference === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+    applyTheme(
+      preference
+        ? preference === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches,
+    );
   });
 </script>
 
 <svelte:head>
   <title>Cachewise — Computation-aware caching</title>
-  <meta name="description" content="An interactive comparison of LRU and computation-aware caching." />
+  <meta
+    name="description"
+    content="An interactive comparison of LRU and computation-aware caching."
+  />
 </svelte:head>
 
 <div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-28 sm:px-6">
@@ -44,4 +51,3 @@
   </main>
   <SiteFooter />
 </div>
-

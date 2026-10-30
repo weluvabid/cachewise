@@ -35,8 +35,8 @@
       {#each scenarioIds as id, index (id)}
         {@const run = runs[id]}
         {@const snapshot = run.snapshots[run.step - 1]}
-        {@const stats = isCachewise ? snapshot?.smartStats : snapshot?.lruStats}
-        {@const entries = isCachewise ? snapshot?.smart : snapshot?.lru}
+        {@const stats = isCachewise ? snapshot?.cachewiseStats : snapshot?.lruStats}
+        {@const entryCount = isCachewise ? snapshot?.cachewiseEntryCount : snapshot?.lruEntryCount}
         {@const bytesUsed = stats?.bytesUsed ?? 0}
         <section class="space-y-2">
           <div class="flex items-center justify-between gap-3">
@@ -44,12 +44,18 @@
               <h3 class="font-semibold">{definitions[id].label}</h3>
               <Tooltip.Root>
                 <Tooltip.Trigger>
-                  <Info size={14} class="text-muted-foreground" aria-label={`About ${definitions[id].label}`} />
+                  <Info
+                    size={14}
+                    class="text-muted-foreground"
+                    aria-label={`About ${definitions[id].label}`}
+                  />
                 </Tooltip.Trigger>
                 <Tooltip.Content>{definitions[id].description}</Tooltip.Content>
               </Tooltip.Root>
             </div>
-            <span class="shrink-0 text-xs tabular-nums text-muted-foreground">{run.step}/{run.snapshots.length}</span>
+            <span class="shrink-0 text-xs tabular-nums text-muted-foreground"
+              >{run.step}/{run.snapshots.length}</span
+            >
           </div>
           <div class="flex items-center justify-between gap-2 text-sm">
             <span class="text-muted-foreground">Memory used</span>
@@ -57,7 +63,7 @@
           </div>
           <Progress value={bytesUsed} max={capacity} />
           <p class="text-xs text-muted-foreground">
-            Resident entries: <span class="font-medium text-foreground">{entries?.length ?? 0}</span>
+            Resident entries: <span class="font-medium text-foreground">{entryCount ?? 0}</span>
           </p>
         </section>
         {#if index < scenarioIds.length - 1}

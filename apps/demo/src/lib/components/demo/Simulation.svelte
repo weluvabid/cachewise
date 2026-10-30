@@ -8,19 +8,25 @@
   import RunSummary from './RunSummary.svelte';
   import { buildSnapshots } from '$lib/simulation/engine';
   import { scenarios, scenarioIds } from '$lib/simulation/scenarios';
-  import type { RunState, ScenarioId } from '$lib/simulation/types';
+  import type { RunState, ScenarioId, Snapshot } from '$lib/simulation/types';
 
   const capacity = 100;
+  const initialSnapshots: Record<ScenarioId, Snapshot[]> = {
+    balanced: buildSnapshots('balanced', capacity),
+    expensive: buildSnapshots('expensive', capacity),
+    pressure: buildSnapshots('pressure', capacity),
+  };
+
   const createRuns = (): Record<ScenarioId, RunState> => ({
-    balanced: { snapshots: buildSnapshots('balanced', capacity), step: 0 },
-    expensive: { snapshots: buildSnapshots('expensive', capacity), step: 0 },
-    pressure: { snapshots: buildSnapshots('pressure', capacity), step: 0 }
+    balanced: { snapshots: initialSnapshots.balanced, step: 0 },
+    expensive: { snapshots: initialSnapshots.expensive, step: 0 },
+    pressure: { snapshots: initialSnapshots.pressure, step: 0 },
   });
 
   const scenarioLabels = {
     balanced: scenarios.balanced.label,
     expensive: scenarios.expensive.label,
-    pressure: scenarios.pressure.label
+    pressure: scenarios.pressure.label,
   } satisfies Record<ScenarioId, string>;
 
   let runs = $state(createRuns());
@@ -29,7 +35,9 @@
 
   let allComplete = $derived(scenarioIds.every((id) => runs[id].step >= runs[id].snapshots.length));
   let hasProgress = $derived(scenarioIds.some((id) => runs[id].step > 0));
-  let playbackLabel = $derived(playing ? 'Pause' : allComplete ? 'Replay all' : hasProgress ? 'Resume' : 'Play all');
+  let playbackLabel = $derived(
+    playing ? 'Pause' : allComplete ? 'Replay all' : hasProgress ? 'Resume' : 'Play all',
+  );
 
   function stop(): void {
     playing = false;
@@ -143,7 +151,13 @@
             </Button>
           </span>
         </Tooltip.Trigger>
-        <Tooltip.Content>{playing ? 'Pause playback to step manually' : allComplete ? 'Simulation complete' : 'Step forward'}</Tooltip.Content>
+        <Tooltip.Content
+          >{playing
+            ? 'Pause playback to step manually'
+            : allComplete
+              ? 'Simulation complete'
+              : 'Step forward'}</Tooltip.Content
+        >
       </Tooltip.Root>
     </div>
   </Tooltip.Provider>

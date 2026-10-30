@@ -14,19 +14,29 @@
     snapshot?: Snapshot;
   };
 
-  let { title, subtitle, entries, bytesUsed, capacity, isCachewise = false, snapshot }: Props = $props();
+  let {
+    title,
+    subtitle,
+    entries,
+    bytesUsed,
+    capacity,
+    isCachewise = false,
+    snapshot,
+  }: Props = $props();
 
   const evictionMessage = (keys: string[], rejected: boolean): string => {
     if (rejected) return 'Admission declined; resident entries were retained.';
     return keys.length ? `Evicted ${keys.join(', ')}.` : 'No eviction required.';
   };
 
-  let decision = $derived(snapshot
-    ? evictionMessage(
-        isCachewise ? snapshot.smartEvicted : snapshot.lruEvicted,
-        isCachewise ? snapshot.smartRejected : snapshot.lruRejected
-      )
-    : 'Waiting for workload.');
+  let decision = $derived(
+    snapshot
+      ? evictionMessage(
+          isCachewise ? snapshot.smartEvicted : snapshot.lruEvicted,
+          isCachewise ? snapshot.smartRejected : snapshot.lruRejected,
+        )
+      : 'Waiting for workload.',
+  );
 </script>
 
 <Card.Root class="flex h-full min-h-0 flex-col">
@@ -51,13 +61,21 @@
             <span class="shrink-0 text-muted-foreground">{entry.size} KB · cost {entry.cost}</span>
           </div>
         {:else}
-          <p class="py-8 text-center text-sm text-muted-foreground">Run the workload to populate the cache.</p>
+          <p class="py-8 text-center text-sm text-muted-foreground">
+            Run the workload to populate the cache.
+          </p>
         {/each}
       </div>
       <ScrollArea.Scrollbar orientation="vertical" />
     </ScrollArea.Root>
-    <div class="mt-auto flex items-start gap-2 rounded-md bg-muted p-3 text-sm text-muted-foreground" aria-live="polite">
-      {#if isCachewise}<Zap size={16} class="mt-0.5 shrink-0" />{:else}<Activity size={16} class="mt-0.5 shrink-0" />{/if}
+    <div
+      class="mt-auto flex items-start gap-2 rounded-md bg-muted p-3 text-sm text-muted-foreground"
+      aria-live="polite"
+    >
+      {#if isCachewise}<Zap size={16} class="mt-0.5 shrink-0" />{:else}<Activity
+          size={16}
+          class="mt-0.5 shrink-0"
+        />{/if}
       <span>{decision}</span>
     </div>
   </Card.Content>

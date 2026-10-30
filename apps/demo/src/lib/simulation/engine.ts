@@ -1,92 +1,80 @@
 import { Cache } from 'cachewise';
 import { generateWorkload } from './generator';
-import type { EntryView, ScenarioId, Snapshot } from './types';
+import type { ScenarioId, Snapshot } from './types';
 
+/**
+ * Execute one deterministic workload against both cache policies.
+ * Snapshots retain only data consumed by the UI, keeping the playback model
+ * compact instead of copying every resident entry after every operation.
+ */
 export function buildSnapshots(id: ScenarioId, capacity: number): Snapshot[] {
   let now = 1_000;
-  const lruEvents: string[] = [];
-  const smartEvents: string[] = [];
   const operations = generateWorkload(id, capacity);
-  const costByKey = new Map(
-    operations.filter((operation) => operation.kind === 'set')
-      .map((operation) => [operation.key, operation.cost])
-  );
-  const lru = new Cache<string, string>({
-    maxBytes: capacity,
-    policy: 'lru',
-    now: () => now,
-    estimateSize: (value) => Number(value.split('|')[0]),
-    onEvent: (event) => { if (event.type === 'evict') lruEvents.push(event.key); }
-  });
-  const smart = new Cache<string, string>({
-    maxBytes: capacity,
-    policy: 'cost-aware',
-    now: () => now,
-    frequencyHalfLife: 100_000,
-    estimateSize: (value) => Number(value.split('|')[0]),
-    onEvent: (event) => { if (event.type === 'evict') smartEvents.push(event.key); }
-  });
-  const snapshots: Snapshot[] = [];
-  let lruComputeCost = 0;
-  let smartComputeCost = 0;
+  const costByKey = new Map<string, number>();
 
-  const view = (cache: Cache<string, string>): EntryView[] =>
-    [...cache.entries()].map(([key]) => {
-      const metadata = cache.getEntryMetadata(key)!;
-      return {
-        key,
-        size: metadata.size,
-        cost: metadata.computeCost,
-        frequency: metadata.frequency
-      };
+  for (const operation of operations) {
+    if (operation.kind === 'set') costByKey.set(operation.key, operation.cost);
+  }
+
+  const createCache = (policy: 'lru' | 'cost-aware') =>
+    new Cache<string, string>({
+      maxBytes: capacity,
+      policy,
+      now: () => now,
+      ...(policy === 'cost-aware' ? { frequencyHalfLife: 100_000 } : {}),
+      estimateSize: (value) => Number(value.slice(0, value.indexOf('|'))),
     });
 
-  for (const [index, operation] of operations.entries()) {
+  const lru = createCache('lru');
+  const cachewise = createCache('cost-aware');
+  const snapshots: Snapshot[] = [];
+  const countEntries = (cache: Cache<string, string>): number => {
+    let count = 0;
+
+    for (const _entry of cache.entries()) count += 1;
+
+    return count;
+  };
+  let lruComputeCost = 0;
+  let cachewiseComputeCost = 0;
+  let lruStats = lru.getStats();
+  let cachewiseStats = cachewise.getStats();
+
+  for (const operation of operations) {
     now += 1_000;
-    const lruEventStart = lruEvents.length;
-    const smartEventStart = smartEvents.length;
-    let lruRejected = false;
-    let smartRejected = false;
 
     if (operation.kind === 'get') {
-      const lruMisses = lru.getStats().misses;
-      const smartMisses = smart.getStats().misses;
+      const lruMissesBefore = lruStats.misses;
+      const cachewiseMissesBefore = cachewiseStats.misses;
+
       lru.get(operation.key);
-      smart.get(operation.key);
-      const cost = costByKey.get(operation.key) ?? 1;
-      if (lru.getStats().misses > lruMisses) lruComputeCost += cost;
-      if (smart.getStats().misses > smartMisses) smartComputeCost += cost;
+      cachewise.get(operation.key);
+
+      const recomputeCost = costByKey.get(operation.key) ?? 1;
+
+      lruStats = lru.getStats();
+      cachewiseStats = cachewise.getStats();
+
+      if (lruStats.misses > lruMissesBefore) lruComputeCost += recomputeCost;
+
+      if (cachewiseStats.misses > cachewiseMissesBefore) cachewiseComputeCost += recomputeCost;
     } else {
       const value = `${operation.size}|${operation.key}`;
-      lruRejected = !lru.set(operation.key, value, {
-        size: operation.size,
-        computeCost: operation.cost
-      });
-      smartRejected = !smart.set(operation.key, value, {
-        size: operation.size,
-        computeCost: operation.cost
-      });
+      const metadata = { size: operation.size, computeCost: operation.cost };
+
+      lru.set(operation.key, value, metadata);
+      cachewise.set(operation.key, value, metadata);
+      lruStats = lru.getStats();
+      cachewiseStats = cachewise.getStats();
     }
 
-    const description = operation.kind === 'get'
-      ? `Read ${operation.key}`
-      : `Computed ${operation.key}`;
     snapshots.push({
-      sequence: index + 1,
-      operation: description,
-      detail: operation.kind === 'get'
-        ? 'Both policies receive the same lookup.'
-        : `${operation.size} KB resident size · recomputation cost ${operation.cost}.`,
-      lru: view(lru),
-      smart: view(smart),
-      lruStats: lru.getStats(),
-      smartStats: smart.getStats(),
-      lruEvicted: lruEvents.slice(lruEventStart),
-      smartEvicted: smartEvents.slice(smartEventStart),
-      lruRejected,
-      smartRejected,
+      lruEntryCount: countEntries(lru),
+      cachewiseEntryCount: countEntries(cachewise),
+      lruStats,
+      cachewiseStats,
       lruComputeCost,
-      smartComputeCost
+      cachewiseComputeCost,
     });
   }
 

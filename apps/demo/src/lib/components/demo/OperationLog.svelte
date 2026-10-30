@@ -25,13 +25,20 @@
 
 <section class="space-y-3">
   <div class="flex flex-wrap items-center justify-between gap-3">
-    <h3 class="font-semibold">Operation log <span class="font-normal text-muted-foreground">· All workloads</span></h3>
-    <span class="text-xs text-muted-foreground">{visibleOperations.length} of {allOperations.length} operations</span>
+    <h3 class="font-semibold">
+      Operation log <span class="font-normal text-muted-foreground">· All workloads</span>
+    </h3>
+    <span class="text-xs text-muted-foreground"
+      >{visibleOperations.length} of {allOperations.length} operations</span
+    >
   </div>
 
   <div class="flex flex-wrap items-center gap-2">
     <div class="relative min-w-0 flex-1 sm:max-w-sm">
-      <Search size={16} class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      <Search
+        size={16}
+        class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+      />
       <input
         aria-label="Search operation log"
         placeholder="Search operations..."
@@ -49,7 +56,14 @@
       </Select.Content>
     </Select.Root>
     {#if query || workloadFilter !== 'all'}
-      <Button variant="ghost" size="sm" onclick={() => { query = ''; workloadFilter = 'all'; }}>Clear</Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onclick={() => {
+          query = '';
+          workloadFilter = 'all';
+        }}>Clear</Button
+      >
     {/if}
   </div>
 

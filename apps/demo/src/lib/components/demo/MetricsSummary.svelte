@@ -3,7 +3,8 @@
   import { Progress } from '$lib/components/ui/progress';
   import type { RunState, ScenarioId } from '$lib/simulation/types';
 
-  let { runs, scenarioIds }: { runs: Record<ScenarioId, RunState>; scenarioIds: ScenarioId[] } = $props();
+  let { runs, scenarioIds }: { runs: Record<ScenarioId, RunState>; scenarioIds: ScenarioId[] } =
+    $props();
 
   let totals = $derived.by(() => {
     const result = {
@@ -14,7 +15,7 @@
       lruCost: 0,
       smartCost: 0,
       completed: 0,
-      total: 0
+      total: 0,
     };
 
     for (const id of scenarioIds) {
@@ -34,7 +35,7 @@
     return result;
   });
 
-  const rate = (part: number, whole: number): number => whole ? (part / whole) * 100 : 0;
+  const rate = (part: number, whole: number): number => (whole ? (part / whole) * 100 : 0);
   const formatRate = (value: number): string => `${value.toFixed(1)}%`;
   let lruRequests = $derived(totals.lruHits + totals.lruMisses);
   let smartRequests = $derived(totals.smartHits + totals.smartMisses);
@@ -42,7 +43,9 @@
   let smartHitRate = $derived(rate(totals.smartHits, smartRequests));
   let lruMissRate = $derived(rate(totals.lruMisses, lruRequests));
   let smartMissRate = $derived(rate(totals.smartMisses, smartRequests));
-  let costReduction = $derived(totals.lruCost > 0 ? ((totals.lruCost - totals.smartCost) / totals.lruCost) * 100 : 0);
+  let costReduction = $derived(
+    totals.lruCost > 0 ? ((totals.lruCost - totals.smartCost) / totals.lruCost) * 100 : 0,
+  );
   let progress = $derived(totals.total ? (totals.completed / totals.total) * 100 : 0);
 </script>
 
@@ -61,9 +64,15 @@
       <div class="space-y-2">
         <div class="flex items-center justify-between gap-2 text-xs">
           <span class="font-medium">LRU</span>
-          <span class="tabular-nums text-muted-foreground">{formatRate(lruHitRate)} hits · {formatRate(lruMissRate)} misses</span>
+          <span class="tabular-nums text-muted-foreground"
+            >{formatRate(lruHitRate)} hits · {formatRate(lruMissRate)} misses</span
+          >
         </div>
-        <div class="flex h-2 w-full overflow-hidden rounded-full bg-muted" role="img" aria-label={`LRU hit rate ${formatRate(lruHitRate)}, miss rate ${formatRate(lruMissRate)}`}>
+        <div
+          class="flex h-2 w-full overflow-hidden rounded-full bg-muted"
+          role="img"
+          aria-label={`LRU hit rate ${formatRate(lruHitRate)}, miss rate ${formatRate(lruMissRate)}`}
+        >
           <div class="h-full bg-primary" style={`width: ${lruHitRate}%`}></div>
           <div class="h-full bg-muted-foreground/40" style={`width: ${lruMissRate}%`}></div>
         </div>
@@ -71,9 +80,15 @@
       <div class="space-y-2">
         <div class="flex items-center justify-between gap-2 text-xs">
           <span class="font-medium">Cachewise</span>
-          <span class="tabular-nums text-muted-foreground">{formatRate(smartHitRate)} hits · {formatRate(smartMissRate)} misses</span>
+          <span class="tabular-nums text-muted-foreground"
+            >{formatRate(smartHitRate)} hits · {formatRate(smartMissRate)} misses</span
+          >
         </div>
-        <div class="flex h-2 w-full overflow-hidden rounded-full bg-muted" role="img" aria-label={`Cachewise hit rate ${formatRate(smartHitRate)}, miss rate ${formatRate(smartMissRate)}`}>
+        <div
+          class="flex h-2 w-full overflow-hidden rounded-full bg-muted"
+          role="img"
+          aria-label={`Cachewise hit rate ${formatRate(smartHitRate)}, miss rate ${formatRate(smartMissRate)}`}
+        >
           <div class="h-full bg-primary" style={`width: ${smartHitRate}%`}></div>
           <div class="h-full bg-muted-foreground/40" style={`width: ${smartMissRate}%`}></div>
         </div>
@@ -90,13 +105,13 @@
       </div>
       <div class="flex items-center justify-between gap-3 text-sm">
         <span class="text-muted-foreground">Cachewise</span>
-        <span class="font-mono font-semibold tabular-nums">{totals.smartCost.toLocaleString()}</span>
+        <span class="font-mono font-semibold tabular-nums">{totals.smartCost.toLocaleString()}</span
+        >
       </div>
       <div class="flex items-center justify-between gap-3 border-t pt-2 text-sm">
         <span class="text-muted-foreground">Cost reduction</span>
         <span class="font-mono font-semibold tabular-nums">{formatRate(costReduction)}</span>
       </div>
     </section>
-
   </Card.Content>
 </Card.Root>
