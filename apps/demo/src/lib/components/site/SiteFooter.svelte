@@ -3,7 +3,7 @@
 </script>
 
 <footer class="flex flex-wrap items-center justify-between gap-4 border-t py-6 text-sm text-muted-foreground">
-  <span class="font-semibold text-foreground">cachewise <span class="font-normal text-muted-foreground">Recompute less. Remember smarter.</span></span>
+  <span class="font-semibold text-foreground">cachewise</span>
   <nav class="flex gap-4" aria-label="Project resources">
     <a href="https://github.com/weluvabid/cachewise" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={12}/></a>
     <a href="https://github.com/weluvabid/cachewise/tree/main/docs" target="_blank" rel="noreferrer">Docs <ArrowUpRight size={12}/></a>
