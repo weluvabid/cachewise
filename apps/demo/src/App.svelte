@@ -3,7 +3,6 @@
   import Simulation from '$lib/components/demo/Simulation.svelte';
   import SiteFooter from '$lib/components/site/SiteFooter.svelte';
   import SiteHeader from '$lib/components/site/SiteHeader.svelte';
-  import { Badge } from '$lib/components/ui/badge';
 
   let darkMode = $state(false);
 
@@ -38,7 +37,7 @@
   <meta name="description" content="An interactive comparison of LRU and computation-aware caching." />
 </svelte:head>
 
-<div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-20 sm:px-6">
+<div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-28 sm:px-6">
   <SiteHeader {darkMode} onToggleTheme={toggleTheme} />
   <main class="flex-1 py-8 sm:py-10">
     <Simulation />
@@ -46,9 +45,3 @@
   <SiteFooter />
 </div>
 
-<Badge
-  variant="outline"
-  class="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border-border/80 bg-background/95 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-muted-foreground shadow-sm backdrop-blur"
->
-  COMPUTATION-AWARE CACHING
-</Badge>
