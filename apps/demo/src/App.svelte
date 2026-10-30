@@ -1,7 +1,6 @@
-<svelte:head>
-  <title>Cachewise</title>
-</svelte:head>
+<script lang="ts">
+  import './app.css';
+</script>
 
-<main>
-  <h1>Cachewise</h1>
-</main>
+<svelte:head><title>Cachewise</title></svelte:head>
+<main><h1>Cachewise</h1></main>
