@@ -61,7 +61,7 @@
           </p>
         </section>
         {#if index < scenarioIds.length - 1}
-          <div class="border-t" />
+          <div class="border-t"></div>
         {/if}
       {/each}
     </Card.Content>

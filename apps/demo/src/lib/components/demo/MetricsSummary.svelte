@@ -80,7 +80,7 @@
       </div>
     </section>
 
-    <div class="border-t" />
+    <div class="border-t"></div>
 
     <section class="space-y-2">
       <h4 class="text-sm font-semibold">Recompute cost</h4>

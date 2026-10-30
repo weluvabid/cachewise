@@ -79,9 +79,11 @@
           </Table.Row>
         {:else}
           <Table.Row>
-            <Table.Cell colspan={7} class="h-24 text-center text-muted-foreground">
-              {allOperations.length ? 'No operations match these filters.' : 'Operations will appear here as the simulations run.'}
-            </Table.Cell>
+            <td colspan={7} class="h-24 text-center text-muted-foreground">
+              {allOperations.length
+                ? 'No operations match these filters.'
+                : 'Operations will appear here as the simulations run.'}
+            </td>
           </Table.Row>
         {/each}
       </Table.Body>

@@ -130,7 +130,7 @@
 
       <Tooltip.Root>
         <Tooltip.Trigger>
-          <span class="inline-flex" tabindex={allComplete || playing ? 0 : undefined}>
+          <span class="inline-flex">
             <Button
               variant="outline"
               size="icon"
