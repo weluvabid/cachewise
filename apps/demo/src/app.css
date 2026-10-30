@@ -195,3 +195,51 @@ footer nav a { display:flex;align-items:center;gap:3px;color:#817c74;text-decora
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; }
 }
+
+/* Theme-aware surfaces; existing light-mode and hover treatments remain unchanged. */
+.header-actions { display:flex;align-items:center;gap:17px; }
+.theme-toggle { display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--foreground);cursor:pointer; }
+.theme-toggle:hover { background:var(--secondary); }
+.budget-select { min-width:82px;height:30px;border:0!important;background:transparent!important;padding:0 5px!important;color:var(--foreground)!important;font-size:12px!important;box-shadow:none!important; }
+.budget-select [data-slot='select-value'] { color:var(--foreground); }
+.tab-progress { margin-left:7px;color:#aaa49a;font-family:ui-monospace,monospace;font-size:9px; }
+.all-progress { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:13px 0 2px;border-bottom:1px solid var(--border); }
+.progress-item { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;align-items:center;color:var(--muted-foreground);font-size:9px; }
+.progress-item>div { grid-column:1/-1;height:3px;border-radius:4px;background:var(--secondary);overflow:hidden; }
+.progress-item>div i { display:block;height:100%;background:#a58b73;transition:width .2s ease; }
+.progress-item small { color:var(--muted-foreground);font:9px ui-monospace,monospace; }
+.result-note { padding:0 0 13px;color:var(--muted-foreground);font-size:9px;line-height:1.55; }
+.dark { color-scheme:dark; }
+.dark body { background:var(--background);color:var(--foreground); }
+.dark .site-shell { color:var(--foreground); }
+.dark .brand-mark { border-color:#393936;background:#1b1b19; }
+.dark .brand-mark span { background:#dedbd4; }
+.dark .brand-mark span:nth-child(3) { background:var(--iris-accent); }
+.dark .github-link,.dark .eyebrow,.dark .intro p,.dark .scenario-description,.dark .scenario-pill,.dark .budget,.dark .memory-line,.dark .cache-card-head p,.dark .details-toggle,.dark .principle p,.dark footer nav a { color:var(--muted-foreground); }
+.dark h1 span { color:#aaa69e; }
+.dark .demo { background:#181817;border-color:#343430;box-shadow:none; }
+.dark .cache-card,.dark .smart-card { background:#1d1d1b;border-color:#383833; }
+.dark .policy-tag { background:#292925;color:#c0bcb3; }
+.dark .accent-tag { background:#302820;color:#d0a181; }
+.dark .memory-line strong,.dark .entries-label span:last-child,.dark .entry strong,.dark .details-copy strong { color:var(--foreground); }
+.dark .memory-track,.dark .progress-track { background:#33332f; }
+.dark .memory-fill { background:#77766e; }
+.dark .smart-fill { background:#b78c6d; }
+.dark .entry { background:#22221f;border-color:#383833; }
+.dark .entry-dot { background:#99958c; }
+.dark .decision { background:#292925;color:#bdb8ae; }
+.dark .smart-decision { background:#302820;color:#d0b49c; }
+.dark .operation-bar,.dark .details-toggle,.dark .all-progress { border-color:#343430; }
+.dark .operation-index,.dark .operation-current strong { color:var(--foreground); }
+.dark .control-button,.dark .icon-control { background:#20201e;border-color:#41413b;color:#dedbd4; }
+.dark .primary-control { background:#dedbd4;border-color:#dedbd4;color:#171716; }
+.dark .primary-control:hover { background:#c7c3ba;color:#171716; }
+.dark .metric-cell { border-color:#393934; }
+.dark .metric-cell strong { color:#dedbd4; }
+.dark .metric-cell strong.smart-number { color:#c49a7b; }
+.dark .principle-icon { background:#1b1b19;border-color:#393934; }
+.dark .theme-toggle { background:#20201e;border-color:#41413b;color:#dedbd4; }
+.dark .budget-select { color:var(--foreground)!important; }
+.dark [data-slot='select-content'] { background:#22221f;border-color:#41413b;color:#dedbd4; }
+.dark [data-slot='select-item']:focus,.dark [data-highlighted] { background:#34342f;color:#f0eee8; }
+@media (max-width:600px) { .all-progress { grid-template-columns:1fr;gap:9px; } .header-actions { gap:10px; } }
