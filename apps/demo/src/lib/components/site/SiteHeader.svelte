@@ -14,7 +14,10 @@
     href="/"
     aria-label="Cachewise home"
   >
-    cachewise
+    <span class="flex items-center gap-2">
+      <img src="/signature.svg" alt="" width="22" height="22" class="size-[22px]" />
+      cachewise
+    </span>
   </a>
   <nav class="flex items-center gap-1" aria-label="Site navigation">
     <Tooltip.Provider delayDuration={300}>

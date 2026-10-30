@@ -181,3 +181,32 @@
     }
   }
 }
+
+@keyframes status-breathe {
+  0%, 100% {
+    opacity: 0.72;
+    box-shadow: 0 0 0 0 oklch(0.68 0.18 25 / 0.22);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 5px oklch(0.68 0.18 25 / 0.08);
+  }
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  margin-right: 0.55rem;
+  border-radius: 9999px;
+  background: oklch(0.68 0.18 25);
+  animation: status-breathe 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot {
+    animation: none;
+    opacity: 0.9;
+  }
+}

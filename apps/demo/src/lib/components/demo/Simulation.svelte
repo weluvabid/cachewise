@@ -107,15 +107,15 @@
     switch (event.code) {
       case 'Space':
         event.preventDefault();
-        togglePlayback();
+        document.getElementById('simulation-playback')?.click();
         break;
       case 'ArrowRight':
         event.preventDefault();
-        if (!playing && !allComplete) stepAll();
+        if (!playing && !allComplete) document.getElementById('simulation-step')?.click();
         break;
       case 'KeyR':
         event.preventDefault();
-        reset();
+        document.getElementById('simulation-reset')?.click();
         break;
     }
   }
@@ -134,6 +134,7 @@
       variant="outline"
       class="h-auto rounded-full border-border/80 px-4 py-2 text-[11px] font-medium tracking-[0.14em] text-muted-foreground sm:text-xs"
     >
+      <span class="status-dot" aria-hidden="true"></span>
       COMPUTATION-AWARE CACHING
     </Badge>
   </div>
@@ -154,6 +155,7 @@
         <Tooltip.Trigger
           class="inline-flex size-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           onclick={reset}
+          id="simulation-reset"
           aria-label="Reset all simulations"
         >
           <RotateCcw size={16} aria-hidden="true" />
@@ -167,6 +169,7 @@
             ? 'inline-flex size-9 items-center justify-center rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-600 transition-colors hover:bg-amber-500/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:text-amber-400'
             : 'inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-colors hover:bg-primary/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'}
           onclick={togglePlayback}
+          id="simulation-playback"
           aria-label={playbackLabel}
         >
           {#if playing}<Pause size={16} aria-hidden="true" />{:else}<Play
@@ -181,6 +184,7 @@
         <Tooltip.Trigger
           class="inline-flex size-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-45"
           onclick={stepAll}
+          id="simulation-step"
           disabled={allComplete || playing}
           aria-label="Step forward"
         >
