@@ -34,6 +34,8 @@
   let playing = $state(false);
   let shortcutsOpen = $state(false);
   let timer: ReturnType<typeof setInterval> | undefined;
+  let keyboardPressed = $state<string | null>(null);
+  let keyboardPressTimer: ReturnType<typeof setTimeout> | undefined;
 
   let allComplete = $derived(scenarioIds.every((id) => runs[id].step >= runs[id].snapshots.length));
   let hasProgress = $derived(scenarioIds.some((id) => runs[id].step > 0));
@@ -81,8 +83,28 @@
     advance();
   }
 
+  function triggerKeyboardClick(id: string): void {
+    const button = document.getElementById(id);
+    if (!(button instanceof HTMLButtonElement) || button.disabled) return;
+
+    keyboardPressed = id;
+    button.click();
+
+    if (keyboardPressTimer !== undefined) clearTimeout(keyboardPressTimer);
+    keyboardPressTimer = setTimeout(() => {
+      keyboardPressed = null;
+      keyboardPressTimer = undefined;
+    }, 140);
+  }
+
   function handleKeydown(event: KeyboardEvent): void {
     if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey || event.repeat) {
+      return;
+    }
+
+    if (shortcutsOpen && event.key === 'Escape') {
+      event.preventDefault();
+      shortcutsOpen = false;
       return;
     }
 
@@ -98,7 +120,7 @@
 
     if (event.key === '?') {
       event.preventDefault();
-      shortcutsOpen = true;
+      triggerKeyboardClick('simulation-shortcuts');
       return;
     }
 
@@ -107,15 +129,15 @@
     switch (event.code) {
       case 'Space':
         event.preventDefault();
-        document.getElementById('simulation-playback')?.click();
+        triggerKeyboardClick('simulation-playback');
         break;
       case 'ArrowRight':
         event.preventDefault();
-        if (!playing && !allComplete) document.getElementById('simulation-step')?.click();
+        if (!playing && !allComplete) triggerKeyboardClick('simulation-step');
         break;
       case 'KeyR':
         event.preventDefault();
-        document.getElementById('simulation-reset')?.click();
+        triggerKeyboardClick('simulation-reset');
         break;
     }
   }
@@ -125,7 +147,10 @@
     return () => window.removeEventListener('keydown', handleKeydown);
   });
 
-  onDestroy(stop);
+  onDestroy(() => {
+    stop();
+    if (keyboardPressTimer !== undefined) clearTimeout(keyboardPressTimer);
+  });
 </script>
 
 <div class="space-y-8">
@@ -153,21 +178,27 @@
     >
       <Tooltip.Root>
         <Tooltip.Trigger
-          class="inline-flex size-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          class={`inline-flex size-9 items-center justify-center rounded-full text-foreground transition-[background-color,transform,filter,box-shadow] duration-150 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${keyboardPressed === 'simulation-reset' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
           onclick={reset}
           id="simulation-reset"
           aria-label="Reset all simulations"
         >
           <RotateCcw size={16} aria-hidden="true" />
         </Tooltip.Trigger>
-        <Tooltip.Content>Reset all simulations · R</Tooltip.Content>
+        <Tooltip.Content>Reset all simulations</Tooltip.Content>
       </Tooltip.Root>
 
       <Tooltip.Root>
         <Tooltip.Trigger
-          class={playing
-            ? 'inline-flex size-9 items-center justify-center rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-600 transition-colors hover:bg-amber-500/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:text-amber-400'
-            : 'inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-colors hover:bg-primary/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'}
+          class={`inline-flex size-9 items-center justify-center rounded-full ${
+            playing
+              ? 'border border-amber-500/40 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400'
+              : 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/85'
+          } transition-[background-color,transform,filter,box-shadow] duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+            keyboardPressed === 'simulation-playback'
+              ? 'scale-95 brightness-90 ring-2 ring-primary/30'
+              : ''
+          }`}
           onclick={togglePlayback}
           id="simulation-playback"
           aria-label={playbackLabel}
@@ -177,12 +208,12 @@
               aria-hidden="true"
             />{/if}
         </Tooltip.Trigger>
-        <Tooltip.Content>{playbackLabel} · Space</Tooltip.Content>
+        <Tooltip.Content>{playbackLabel}</Tooltip.Content>
       </Tooltip.Root>
 
       <Tooltip.Root>
         <Tooltip.Trigger
-          class="inline-flex size-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-45"
+          class={`inline-flex size-9 items-center justify-center rounded-full text-foreground transition-[background-color,transform,filter,box-shadow] duration-150 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-45 ${keyboardPressed === 'simulation-step' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
           onclick={stepAll}
           id="simulation-step"
           disabled={allComplete || playing}
@@ -195,7 +226,7 @@
             ? 'Pause playback to step manually'
             : allComplete
               ? 'Simulation complete'
-              : 'Step forward · →'}</Tooltip.Content
+              : 'Step forward'}</Tooltip.Content
         >
       </Tooltip.Root>
 
@@ -204,8 +235,9 @@
       <Dialog.Root bind:open={shortcutsOpen}>
         <Tooltip.Root>
           <Tooltip.Trigger
-            class="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            class={`inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-[background-color,transform,filter,box-shadow] duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${keyboardPressed === 'simulation-shortcuts' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
             onclick={() => (shortcutsOpen = true)}
+            id="simulation-shortcuts"
             aria-label="Show keyboard shortcuts"
           >
             <Keyboard size={16} aria-hidden="true" />

@@ -183,7 +183,8 @@
 }
 
 @keyframes status-breathe {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.72;
     box-shadow: 0 0 0 0 oklch(0.68 0.18 25 / 0.22);
   }
