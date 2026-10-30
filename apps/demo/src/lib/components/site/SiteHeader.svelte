@@ -15,7 +15,7 @@
     aria-label="Cachewise home"
   >
     <span class="flex items-center gap-2">
-      <img src="/signature.svg" alt="" width="22" height="22" class="size-[22px]" />
+      <img src="/signature.svg" alt="" width="22" height="22" class="size-[22px] dark:invert" />
       cachewise
     </span>
   </a>

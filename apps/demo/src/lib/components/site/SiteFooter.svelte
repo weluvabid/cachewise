@@ -7,7 +7,7 @@
   class="flex flex-wrap items-center justify-between gap-4 border-t border-border/80 py-6 text-sm text-muted-foreground"
 >
   <span class="inline-flex items-center gap-2 font-semibold text-foreground">
-    <img src="/signature.svg" alt="" width="20" height="20" class="size-5" />
+    <img src="/signature.svg" alt="" width="20" height="20" class="size-5 dark:invert" />
   </span>
   <nav class="flex items-center gap-1" aria-label="Project resources">
     <a
