@@ -69,10 +69,10 @@ jobs:
         run: cat benchmark-results/report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload raw results and summaries
-        if: always() && hashFiles('benchmark-results/report.json') != ''
+        if: always() && hashFiles('packages/cachewise/benchmark-results/report.json') != ''
         uses: actions/upload-artifact@v4
         with:
           name: cachewise-benchmark-${{ github.run_id }}-${{ github.run_attempt }}
-          path: benchmark-results/
+          path: packages/cachewise/benchmark-results/
           if-no-files-found: error
           retention-days: 90
