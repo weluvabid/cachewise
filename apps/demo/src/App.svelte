@@ -4,12 +4,16 @@
   import SiteFooter from '$lib/components/site/SiteFooter.svelte';
   import SiteHeader from '$lib/components/site/SiteHeader.svelte';
 
-  let darkMode = $state(false);
+  let darkMode = $state(document.documentElement.classList.contains('dark'));
 
   function applyTheme(value: boolean): void {
     darkMode = value;
     document.documentElement.classList.toggle('dark', value);
     document.documentElement.style.colorScheme = value ? 'dark' : 'light';
+    document.documentElement.style.backgroundColor = value ? '#0b0b0b' : '#ffffff';
+    document
+      .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+      ?.setAttribute('content', value ? '#0b0b0b' : '#ffffff');
     try {
       localStorage.setItem('cachewise-theme', value ? 'dark' : 'light');
     } catch {
@@ -22,17 +26,9 @@
   }
 
   onMount(() => {
-    let preference: string | null = null;
-    try {
-      preference = localStorage.getItem('cachewise-theme');
-    } catch {
-      // Fall back to the operating-system preference.
-    }
-    applyTheme(
-      preference
-        ? preference === 'dark'
-        : window.matchMedia('(prefers-color-scheme: dark)').matches,
-    );
+    // index.html applies the theme before the first paint. Hydration adopts it
+    // instead of briefly rendering the opposite theme.
+    darkMode = document.documentElement.classList.contains('dark');
   });
 </script>
 

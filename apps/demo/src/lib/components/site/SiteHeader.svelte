@@ -7,11 +7,11 @@
 </script>
 
 <header
-  class="sticky top-4 z-40 mt-4 flex items-center justify-between rounded-full border border-black/10 bg-white/90 px-4 py-3 shadow-lg shadow-black/[0.07] backdrop-blur-xl transition-colors dark:border-white/15 dark:bg-[rgba(34,34,34,0.9)] dark:shadow-black/35 sm:px-5"
+  class="sticky top-3 z-40 mt-3 flex items-center justify-between rounded-full border border-border/80 bg-background/90 px-4 py-2.5 shadow-lg shadow-black/10 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 transition-colors dark:shadow-black/35 sm:px-5"
 >
   <a
     class="rounded-sm font-semibold tracking-tight text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-    href="/"
+    href={`${import.meta.env.BASE_URL}`}
     aria-label="Cachewise home"
   >
     <span class="flex items-center gap-2">
@@ -29,7 +29,7 @@
     <Tooltip.Provider delayDuration={300}>
       <Tooltip.Root>
         <Tooltip.Trigger
-          class="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:hover:bg-white/[0.10]"
+          class="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground surface-transition active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           onclick={onToggleTheme}
           aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
         >
@@ -43,7 +43,7 @@
         >
       </Tooltip.Root>
       <a
-        class="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:hover:bg-white/[0.10]"
+        class="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground surface-transition active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         href="https://github.com/weluvabid/cachewise"
         target="_blank"
         rel="noopener noreferrer"

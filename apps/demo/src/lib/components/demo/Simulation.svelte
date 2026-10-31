@@ -4,6 +4,7 @@
   import { Badge } from '$lib/components/ui/badge';
   import * as Tooltip from '$lib/components/ui/tooltip';
   import * as Dialog from '$lib/components/ui/dialog';
+  import { Spinner } from '$lib/components/ui/spinner';
   import { Separator } from '$lib/components/ui/separator';
   import WorkloadCard from './WorkloadCard.svelte';
   import RunSummary from './RunSummary.svelte';
@@ -36,6 +37,8 @@
   let timer: ReturnType<typeof setInterval> | undefined;
   let keyboardPressed = $state<string | null>(null);
   let keyboardPressTimer: ReturnType<typeof setTimeout> | undefined;
+  let badgeSentinel: HTMLDivElement;
+  let badgePinned = $state(false);
 
   let allComplete = $derived(scenarioIds.every((id) => runs[id].step >= runs[id].snapshots.length));
   let hasProgress = $derived(scenarioIds.some((id) => runs[id].step > 0));
@@ -144,7 +147,20 @@
 
   onMount(() => {
     window.addEventListener('keydown', handleKeydown);
-    return () => window.removeEventListener('keydown', handleKeydown);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) badgePinned = !entry.isIntersecting;
+      },
+      { rootMargin: '-84px 0px 0px 0px', threshold: 0 },
+    );
+    observer.observe(badgeSentinel);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+      observer.disconnect();
+    };
   });
 
   onDestroy(() => {
@@ -154,12 +170,19 @@
 </script>
 
 <div class="space-y-8">
-  <div class="flex justify-center">
+  <div bind:this={badgeSentinel} class="h-px" aria-hidden="true"></div>
+  <div class="sticky top-[5.25rem] z-30 -mt-8 flex justify-center py-2">
     <Badge
       variant="outline"
-      class="h-auto rounded-full border-border/80 px-4 py-2 text-[11px] font-medium tracking-[0.14em] text-muted-foreground sm:text-xs"
+      class={`rounded-full border-border/80 bg-card/95 font-medium tracking-[0.14em] text-muted-foreground shadow-sm backdrop-blur-xl transition-[padding,font-size] duration-200 ${badgePinned ? 'h-7 px-3 text-[10px] sm:text-[11px]' : 'h-auto px-4 py-2 text-[11px] sm:text-xs'}`}
     >
-      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-indicator" aria-hidden="true">
+        {#if playing}
+          <Spinner class="!size-full text-[var(--brand)]" role="presentation" aria-hidden="true" />
+        {:else}
+          <span class="status-dot"></span>
+        {/if}
+      </span>
       COMPUTATION-AWARE CACHING
     </Badge>
   </div>
@@ -173,12 +196,12 @@
 
   <Tooltip.Provider delayDuration={250}>
     <nav
-      class="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border/80 bg-background/90 p-2 shadow-xl shadow-black/10 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
+      class="playback-dock fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border/80 bg-background/90 p-2 shadow-xl shadow-black/10 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
       aria-label="Simulation playback controls"
     >
       <Tooltip.Root>
         <Tooltip.Trigger
-          class={`inline-flex size-9 items-center justify-center rounded-full text-foreground transition-[background-color,transform,filter,box-shadow] duration-150 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${keyboardPressed === 'simulation-reset' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
+          class={`playback-control inline-flex size-11 items-center justify-center rounded-full text-foreground transition-[background-color,transform,filter,box-shadow] duration-150 active:scale-95 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${keyboardPressed === 'simulation-reset' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
           onclick={reset}
           id="simulation-reset"
           aria-label="Reset all simulations"
@@ -190,11 +213,11 @@
 
       <Tooltip.Root>
         <Tooltip.Trigger
-          class={`inline-flex size-9 items-center justify-center rounded-full ${
+          class={`playback-control inline-flex size-11 items-center justify-center rounded-full ${
             playing
               ? 'border border-amber-500/40 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400'
               : 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/85'
-          } transition-[background-color,transform,filter,box-shadow] duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+          } transition-[background-color,transform,filter,box-shadow] duration-150 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
             keyboardPressed === 'simulation-playback'
               ? 'scale-95 brightness-90 ring-2 ring-primary/30'
               : ''
@@ -213,7 +236,7 @@
 
       <Tooltip.Root>
         <Tooltip.Trigger
-          class={`inline-flex size-9 items-center justify-center rounded-full text-foreground transition-[background-color,transform,filter,box-shadow] duration-150 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-45 ${keyboardPressed === 'simulation-step' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
+          class={`playback-control inline-flex size-11 items-center justify-center rounded-full text-foreground transition-[background-color,transform,filter,box-shadow] duration-150 active:scale-95 hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-45 ${keyboardPressed === 'simulation-step' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
           onclick={stepAll}
           id="simulation-step"
           disabled={allComplete || playing}
@@ -230,12 +253,12 @@
         >
       </Tooltip.Root>
 
-      <div class="mx-0.5 h-5 w-px bg-border" aria-hidden="true"></div>
+      <div class="keyboard-shortcut-control mx-0.5 h-5 w-px bg-border" aria-hidden="true"></div>
 
       <Dialog.Root bind:open={shortcutsOpen}>
         <Tooltip.Root>
           <Tooltip.Trigger
-            class={`inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-[background-color,transform,filter,box-shadow] duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${keyboardPressed === 'simulation-shortcuts' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
+            class={`keyboard-shortcut-control playback-control inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-[background-color,transform,filter,box-shadow] duration-150 active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${keyboardPressed === 'simulation-shortcuts' ? 'scale-95 bg-muted brightness-90 ring-2 ring-primary/30' : ''}`}
             onclick={() => (shortcutsOpen = true)}
             id="simulation-shortcuts"
             aria-label="Show keyboard shortcuts"

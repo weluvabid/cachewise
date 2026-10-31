@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@icons-pack/svelte-simple-icons": "^7.2.0",
-    "@weluvabid/iris": "^0.1.2",
     "cachewise": "workspace:*",
     "svelte": "^5.38.0"
   },

@@ -4,5 +4,3 @@ packages:
 allowBuilds:
   esbuild: true
   simple-git-hooks: true
-minimumReleaseAgeExclude:
-  - '@weluvabid/iris@0.1.2'

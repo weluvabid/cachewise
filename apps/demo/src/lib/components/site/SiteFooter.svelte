@@ -17,7 +17,7 @@
   </span>
   <nav class="flex items-center gap-1" aria-label="Project resources">
     <a
-      class="inline-flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:hover:bg-white/[0.10]"
+      class="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground surface-transition active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       href="https://github.com/weluvabid/cachewise"
       target="_blank"
       rel="noopener noreferrer"
@@ -27,7 +27,7 @@
       <SiGithub size={19} aria-hidden="true" />
     </a>
     <a
-      class="inline-flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:hover:bg-white/[0.10]"
+      class="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground surface-transition active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       href="https://github.com/weluvabid/cachewise/tree/main/docs"
       target="_blank"
       rel="noopener noreferrer"
@@ -37,12 +37,12 @@
       <BookOpenText size={19} aria-hidden="true" />
     </a>
     <a
-      class="inline-flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:hover:bg-white/[0.10]"
-      href="https://github.com/weluvabid/cachewise/issues"
+      class="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground surface-transition active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      href="https://github.com/weluvabid/cachewise/wiki"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Report an issue on GitHub (opens in a new tab)"
-      title="Report an issue"
+      aria-label="Cachewise project wiki (opens in a new tab)"
+      title="Wiki"
     >
       <CircleQuestionMark size={19} aria-hidden="true" />
     </a>
