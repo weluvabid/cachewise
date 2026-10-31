@@ -35,7 +35,7 @@
     "publint": "^0.3.15",
     "@arethetypeswrong/cli": "^0.18.2",
     "simple-git-hooks": "^2.13.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.46.0",
     "vitest": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
