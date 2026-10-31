@@ -16,10 +16,12 @@ export interface CacheOptions<K, V> {
   readonly estimateSize?: (value: V, key: K) => number;
   readonly defaultComputeCost?: number;
   readonly frequencyHalfLife?: number;
+  /** Number of counters per row in the bounded frequency sketch. */
   readonly maxTrackedKeys?: number;
   readonly now?: () => number;
   readonly onDispose?: (value: V, key: K, reason: DisposeReason) => void;
   readonly onEvent?: (event: CacheEvent<K>) => void;
+  readonly onCallbackError?: (error: unknown, callback: 'dispose' | 'event') => void;
 }
 
 export type DisposeReason = 'evicted' | 'deleted' | 'expired' | 'cleared' | 'replaced';
@@ -62,6 +64,8 @@ export interface CachePolicyEntry<K> {
   readonly key: K;
   readonly size: number;
   readonly computeCost: number;
+  readonly costWeight?: number;
+  readonly reuseWeight?: number;
   readonly lastAccessedAt: number;
   readonly frequency: number;
 }

@@ -1,9 +1,10 @@
 import type { CachePolicyEntry } from '../types.js';
 
 export interface EvictionPolicy<K> {
-  selectVictim(
+  selectVictims(
     entries: readonly CachePolicyEntry<K>[],
     now: number,
-  ): CachePolicyEntry<K> | undefined;
+    bytesNeeded: number,
+  ): readonly CachePolicyEntry<K>[];
   shouldAdmit(candidate: CachePolicyEntry<K>, victim: CachePolicyEntry<K>, now: number): boolean;
 }

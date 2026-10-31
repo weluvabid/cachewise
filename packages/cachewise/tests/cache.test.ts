@@ -133,6 +133,29 @@ describe('Cache', () => {
     expect(cache.get('delayed')).toBeUndefined();
   });
 
+  it('invalidates in-flight computations without retaining historical key metadata', async () => {
+    const cache = new Cache<number, number>({ maxBytes: 32, estimateSize: () => 1 });
+
+    for (let key = 0; key < 500; key += 1) {
+      let resolve!: (value: number) => void;
+      const pending = cache.getOrCompute(
+        key,
+        () =>
+          new Promise<number>((done) => {
+            resolve = done;
+          }),
+      );
+
+      await Promise.resolve();
+      cache.delete(key);
+      resolve(key);
+      await expect(pending).resolves.toBe(key);
+      expect(cache.has(key)).toBe(false);
+    }
+
+    expect(cache.getStats().inflight).toBe(0);
+  });
+
   it('does not repopulate after clear invalidates an in-flight computation', async () => {
     const cache = new Cache<string, number>({ maxBytes: 20, estimateSize: () => 4 });
     let resolve!: (value: number) => void;
@@ -222,6 +245,80 @@ describe('Cache', () => {
     expect(() => cache.set('a', 'x')).toThrow(RangeError);
     expect(() => cache.set('a', 'x', { computeCost: Number.NaN })).toThrow(RangeError);
   });
+
+  it('requires an integer byte budget instead of silently flooring fractions', () => {
+    expect(() => new Cache({ maxBytes: 0.5 })).toThrow(RangeError);
+    expect(() => new Cache({ maxBytes: 1.5 })).toThrow(RangeError);
+    expect(() => new Cache({ maxBytes: Number.MAX_SAFE_INTEGER + 1 })).toThrow(RangeError);
+    expect(new Cache({ maxBytes: 1 }).maxBytes).toBe(1);
+  });
+
+  it('charges at least one logical byte for zero-sized values', () => {
+    const cache = new Cache<number, undefined>({
+      maxBytes: 3,
+      estimateSize: () => 0,
+      policy: 'lru',
+    });
+
+    expect(cache.set(1, undefined)).toBe(true);
+    expect(cache.set(2, undefined)).toBe(true);
+    expect(cache.set(3, undefined)).toBe(true);
+    expect(cache.set(4, undefined)).toBe(true);
+    expect(cache.has(1)).toBe(false);
+    expect(cache.getStats()).toMatchObject({ entries: 3, bytesUsed: 3, bytesAvailable: 0 });
+  });
+
+  it('keeps lifecycle operations consistent when user callbacks throw', () => {
+    const callbackErrors: Array<[unknown, 'dispose' | 'event']> = [];
+    const cache = new Cache<string, string>({
+      maxBytes: 10,
+      onDispose: () => {
+        throw new Error('dispose failed');
+      },
+      onEvent: () => {
+        throw new Error('event failed');
+      },
+      onCallbackError: (error, callback) => callbackErrors.push([error, callback]),
+    });
+
+    expect(() => cache.set('key', 'value')).not.toThrow();
+    expect(() => cache.delete('key')).not.toThrow();
+    expect(cache.getStats()).toMatchObject({ entries: 0, bytesUsed: 0 });
+    expect(callbackErrors.map(([, callback]) => callback)).toContain('event');
+    expect(callbackErrors.map(([, callback]) => callback)).toContain('dispose');
+  });
+
+  it('completes clear when every disposal callback throws', () => {
+    const disposed: string[] = [];
+    const cache = new Cache<string, string>({
+      maxBytes: 10,
+      onDispose: (value) => {
+        disposed.push(value);
+        throw new Error('dispose failed');
+      },
+    });
+
+    cache.set('a', 'one');
+    cache.set('b', 'two');
+    expect(() => cache.clear()).not.toThrow();
+    expect(disposed).toEqual(['one', 'two']);
+    expect(cache.getStats()).toMatchObject({ entries: 0, bytesUsed: 0 });
+  });
+
+  it('does not let a throwing callback-error handler interrupt cache operations', () => {
+    const cache = new Cache<string, string>({
+      maxBytes: 10,
+      onEvent: () => {
+        throw new Error('event failed');
+      },
+      onCallbackError: () => {
+        throw new Error('reporting failed');
+      },
+    });
+
+    expect(() => cache.set('key', 'value')).not.toThrow();
+    expect(cache.get('key')).toBe('value');
+  });
 });
 
 describe('cost-aware retention', () => {
@@ -259,6 +356,25 @@ describe('cost-aware retention', () => {
     expect(accepted).toBe(false);
     expect(cache.has('valuable')).toBe(true);
     expect(cache.has('other')).toBe(true);
+    expect(cache.getStats().bytesUsed).toBe(10);
+  });
+
+  it('does not partially evict when a multi-victim admission plan fails', () => {
+    const cache = new Cache<string, string>({
+      maxBytes: 10,
+      estimateSize: (value) => value.length,
+    });
+
+    cache.set('cheap', 'aaa', { computeCost: 1 });
+    cache.set('medium', 'bbbb', { computeCost: 10 });
+    cache.set('valuable', 'ccc', { computeCost: 1_000 });
+
+    const accepted = cache.set('candidate', '123456', { computeCost: 10 });
+
+    expect(accepted).toBe(false);
+    expect(cache.has('cheap')).toBe(true);
+    expect(cache.has('medium')).toBe(true);
+    expect(cache.has('valuable')).toBe(true);
     expect(cache.getStats().bytesUsed).toBe(10);
   });
 
@@ -340,18 +456,21 @@ describe('maintenance and observability', () => {
     expect(eviction?.explanation).toContain('LRU');
   });
 
-  it('bounds the frequency estimator key set', () => {
-    const cache = new Cache<number, string>({
+  it('retains hot-key frequency through high-cardinality miss traffic', () => {
+    const cache = new Cache<string, string>({
       maxBytes: 10,
-      maxTrackedKeys: 2,
+      maxTrackedKeys: 4_096,
+      frequencyHalfLife: 1_000_000,
       estimateSize: () => 1,
     });
 
-    cache.get(1);
-    cache.get(2);
-    cache.get(3);
+    for (let index = 0; index < 100; index += 1) cache.get('hot');
 
-    expect(cache.getStats().bytesUsed).toBe(0);
+    for (let index = 0; index < 20_000; index += 1) cache.get(`cold:${index}`);
+
+    expect(cache.getEntryMetadata('hot')).toBeUndefined();
+    cache.set('hot', 'value');
+    expect(cache.getEntryMetadata('hot')?.frequency).toBeGreaterThanOrEqual(100);
   });
 
   it('updates recency and frequency metadata on successful reads only', () => {

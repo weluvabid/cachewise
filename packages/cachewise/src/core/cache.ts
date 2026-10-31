@@ -20,22 +20,24 @@ interface Entry<K, V> {
   readonly value: V;
   readonly size: number;
   readonly computeCost: number;
+  readonly costWeight: number;
   readonly createdAt: number;
   readonly expiresAt: number | undefined;
   lastAccessedAt: number;
   frequency: number;
+  reuseWeight: number;
 }
 
 interface Flight<V> {
   readonly controller: AbortController;
   readonly promise: Promise<V>;
   waiters: number;
+  cacheable: boolean;
 }
 
 export class Cache<K extends CacheKey, V> {
   readonly #entries = new Map<K, Entry<K, V>>();
   readonly #flights = new Map<K, Flight<V>>();
-  readonly #versions = new Map<K, number>();
   readonly #maxBytes: number;
   readonly #defaultTtl: number | undefined;
   readonly #defaultComputeCost: number;
@@ -46,6 +48,7 @@ export class Cache<K extends CacheKey, V> {
   readonly #frequency: FrequencySketch<K>;
   readonly #onDispose: CacheOptions<K, V>['onDispose'];
   readonly #onEvent: CacheOptions<K, V>['onEvent'];
+  readonly #onCallbackError: CacheOptions<K, V>['onCallbackError'];
   #bytesUsed = 0;
   #hits = 0;
   #misses = 0;
@@ -54,11 +57,11 @@ export class Cache<K extends CacheKey, V> {
   #epoch = 0;
 
   constructor(options: CacheOptions<K, V>) {
-    if (!Number.isFinite(options.maxBytes) || options.maxBytes <= 0) {
-      throw new RangeError('maxBytes must be a finite, positive number.');
+    if (!Number.isSafeInteger(options.maxBytes) || options.maxBytes <= 0) {
+      throw new RangeError('maxBytes must be a positive safe integer.');
     }
 
-    this.#maxBytes = Math.floor(options.maxBytes);
+    this.#maxBytes = options.maxBytes;
     this.#defaultTtl = options.ttl;
     this.#defaultComputeCost = options.defaultComputeCost ?? 1;
     this.#estimate = options.estimateSize ?? ((value) => defaultEstimateSize(value));
@@ -72,6 +75,7 @@ export class Cache<K extends CacheKey, V> {
     this.#policy = this.#policyName === 'lru' ? new LruPolicy<K>() : new CostAwarePolicy<K>();
     this.#onDispose = options.onDispose;
     this.#onEvent = options.onEvent;
+    this.#onCallbackError = options.onCallbackError;
 
     this.#validateDuration(this.#defaultTtl, 'ttl');
     this.#validateCost(this.#defaultComputeCost);
@@ -100,6 +104,7 @@ export class Cache<K extends CacheKey, V> {
 
     entry.lastAccessedAt = now;
     entry.frequency = this.#frequency.record(key, now);
+    entry.reuseWeight = Math.log2(1 + entry.frequency);
     this.#hits += 1;
     this.#emit({ type: 'hit', key });
 
@@ -122,7 +127,9 @@ export class Cache<K extends CacheKey, V> {
 
   set(key: K, value: V, options: SetOptions = {}): boolean {
     const now = this.#now();
-    const size = validateSize(options.size ?? this.#estimate(value, key));
+    // Every resident entry consumes at least one logical byte. This keeps the
+    // entry count bounded even when callers provide zero-sized values.
+    const size = Math.max(1, validateSize(options.size ?? this.#estimate(value, key)));
     const computeCost = options.computeCost ?? this.#defaultComputeCost;
     const ttl = options.ttl ?? this.#defaultTtl;
 
@@ -137,60 +144,67 @@ export class Cache<K extends CacheKey, V> {
     }
 
     const existing = this.#entries.get(key);
+    const frequency = Math.max(1, this.#frequency.estimate(key, now));
 
     const candidate: Entry<K, V> = {
       key,
       value,
       size,
       computeCost,
+      costWeight: Math.log2(1 + computeCost),
       createdAt: now,
       lastAccessedAt: now,
       expiresAt: ttl === undefined ? undefined : now + ttl,
-      frequency: Math.max(1, this.#frequency.estimate(key, now)),
+      frequency,
+      reuseWeight: Math.log2(1 + frequency),
     };
 
+    const bytesAfterReplacement = this.#bytesUsed - (existing?.size ?? 0);
+    const bytesNeeded = bytesAfterReplacement + size - this.#maxBytes;
     const victims: Entry<K, V>[] = [];
-    const remaining = new Map(this.#entries);
-    let projectedBytes = this.#bytesUsed;
 
-    if (existing) {
-      remaining.delete(key);
-      projectedBytes -= existing.size;
-    }
+    // The common path does not allocate a copy of the resident map or build
+    // policy records. Planning is only needed when capacity is actually tight.
+    if (bytesNeeded > 0) {
+      const policyEntries: CachePolicyEntry<K>[] = [];
 
-    while (projectedBytes + size > this.#maxBytes) {
-      for (const entry of remaining.values()) {
-        entry.frequency = this.#frequency.estimate(entry.key, now);
+      for (const entry of this.#entries.values()) {
+        if (entry === existing) continue;
+
+        policyEntries.push(entry);
       }
 
-      const policyEntries = [...remaining.values()].map((entry) => this.#toPolicyEntry(entry));
-      const selected = this.#policy.selectVictim(policyEntries, now);
-      const victim = selected ? remaining.get(selected.key) : undefined;
+      const selected = this.#policy.selectVictims(policyEntries, now, bytesNeeded);
+      let selectedBytes = 0;
+      const candidatePolicyEntry: CachePolicyEntry<K> = candidate;
 
-      if (!victim) break;
+      for (const selectedEntry of selected) {
+        const victim = this.#entries.get(selectedEntry.key);
 
-      if (
-        !shouldAdmit(this.#policy, this.#toPolicyEntry(candidate), this.#toPolicyEntry(victim), now)
-      ) {
+        if (!victim) continue;
+
+        if (!shouldAdmit(this.#policy, candidatePolicyEntry, selectedEntry, now)) {
+          this.#rejections += 1;
+          this.#emit({ type: 'reject', key, reason: 'admission' });
+
+          return false;
+        }
+
+        victims.push(victim);
+        selectedBytes += victim.size;
+
+        if (selectedBytes >= bytesNeeded) break;
+      }
+
+      if (selectedBytes < bytesNeeded) {
         this.#rejections += 1;
         this.#emit({ type: 'reject', key, reason: 'admission' });
 
         return false;
       }
-
-      victims.push(victim);
-      remaining.delete(victim.key);
-      projectedBytes -= victim.size;
     }
 
-    if (projectedBytes + size > this.#maxBytes) {
-      this.#rejections += 1;
-      this.#emit({ type: 'reject', key, reason: 'admission' });
-
-      return false;
-    }
-
-    this.#bumpVersion(key);
+    this.#invalidatePending(key);
 
     if (existing) this.#remove(existing, 'replaced');
 
@@ -216,7 +230,7 @@ export class Cache<K extends CacheKey, V> {
   }
 
   delete(key: K): boolean {
-    this.#bumpVersion(key);
+    this.#invalidatePending(key);
     const entry = this.#entries.get(key);
 
     if (!entry) return false;
@@ -237,7 +251,6 @@ export class Cache<K extends CacheKey, V> {
     for (const entry of this.#entries.values()) this.#dispose(entry, 'cleared');
 
     this.#entries.clear();
-    this.#versions.clear();
     this.#frequency.clear();
     this.#bytesUsed = 0;
     this.#emit({ type: 'clear' });
@@ -258,17 +271,12 @@ export class Cache<K extends CacheKey, V> {
 
     if (!flight) {
       const controller = new AbortController();
-      const version = this.#versions.get(key) ?? 0;
       const epoch = this.#epoch;
       const startedAt = this.#now();
       const promise = Promise.resolve()
         .then(() => factory(controller.signal))
         .then((value) => {
-          if (
-            !controller.signal.aborted &&
-            epoch === this.#epoch &&
-            version === (this.#versions.get(key) ?? 0)
-          ) {
+          if (!controller.signal.aborted && epoch === this.#epoch && flight?.cacheable === true) {
             this.set(key, value, options);
           }
 
@@ -280,7 +288,7 @@ export class Cache<K extends CacheKey, V> {
           if (this.#flights.get(key) === flight) this.#flights.delete(key);
         });
 
-      flight = { controller, promise, waiters: 0 };
+      flight = { controller, promise, waiters: 0, cacheable: true };
       this.#flights.set(key, flight);
     }
 
@@ -364,16 +372,6 @@ export class Cache<K extends CacheKey, V> {
     return this.#maxBytes;
   }
 
-  #toPolicyEntry(entry: Entry<K, V>): CachePolicyEntry<K> {
-    return {
-      key: entry.key,
-      size: entry.size,
-      computeCost: entry.computeCost,
-      lastAccessedAt: entry.lastAccessedAt,
-      frequency: entry.frequency,
-    };
-  }
-
   #remove(entry: Entry<K, V>, reason: DisposeReason): void {
     if (!this.#entries.delete(entry.key)) return;
 
@@ -387,15 +385,23 @@ export class Cache<K extends CacheKey, V> {
   }
 
   #dispose(entry: Entry<K, V>, reason: DisposeReason): void {
-    this.#onDispose?.(entry.value, entry.key, reason);
+    if (!this.#onDispose) return;
+
+    try {
+      this.#onDispose(entry.value, entry.key, reason);
+    } catch (error) {
+      this.#reportCallbackError(error, 'dispose');
+    }
   }
 
   #isExpired(entry: Entry<K, V>, now: number): boolean {
     return entry.expiresAt !== undefined && entry.expiresAt <= now;
   }
 
-  #bumpVersion(key: K): void {
-    this.#versions.set(key, (this.#versions.get(key) ?? 0) + 1);
+  #invalidatePending(key: K): void {
+    const flight = this.#flights.get(key);
+
+    if (flight) flight.cacheable = false;
   }
 
   #validateDuration(value: number | undefined, name: string): void {
@@ -411,7 +417,21 @@ export class Cache<K extends CacheKey, V> {
   }
 
   #emit(event: CacheEvent<K>): void {
-    this.#onEvent?.(event);
+    if (!this.#onEvent) return;
+
+    try {
+      this.#onEvent(event);
+    } catch (error) {
+      this.#reportCallbackError(error, 'event');
+    }
+  }
+
+  #reportCallbackError(error: unknown, callback: 'dispose' | 'event'): void {
+    try {
+      this.#onCallbackError?.(error, callback);
+    } catch {
+      // Error reporting must never interfere with cache state transitions.
+    }
   }
 
   #abortError(): Error {

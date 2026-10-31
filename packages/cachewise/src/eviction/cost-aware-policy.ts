@@ -15,18 +15,19 @@ export class CostAwarePolicy<K> implements EvictionPolicy<K> {
   score(entry: CachePolicyEntry<K>, now: number): number {
     const age = Math.max(0, now - entry.lastAccessedAt);
     const recency = 0.5 ** (age / this.#recencyHalfLife);
-    const reuse = Math.log2(1 + entry.frequency);
-    const cost = Math.log2(1 + entry.computeCost);
+    const reuse = entry.reuseWeight ?? Math.log2(1 + entry.frequency);
+    const cost = entry.costWeight ?? Math.log2(1 + entry.computeCost);
     const size = Math.max(1, entry.size);
 
     return (recency * reuse * cost) / size;
   }
 
-  selectVictim(
+  selectVictims(
     entries: readonly CachePolicyEntry<K>[],
     now: number,
-  ): CachePolicyEntry<K> | undefined {
-    let victim: CachePolicyEntry<K> | undefined;
+    bytesNeeded: number,
+  ): readonly CachePolicyEntry<K>[] {
+    let firstVictim: CachePolicyEntry<K> | undefined;
     let lowestScore = Number.POSITIVE_INFINITY;
 
     for (const entry of entries) {
@@ -34,11 +35,28 @@ export class CostAwarePolicy<K> implements EvictionPolicy<K> {
 
       if (score < lowestScore) {
         lowestScore = score;
-        victim = entry;
+        firstVictim = entry;
       }
     }
 
-    return victim;
+    if (!firstVictim) return [];
+
+    if (firstVictim.size >= bytesNeeded) return [firstVictim];
+
+    const ordered = [...entries].sort(
+      (left, right) => this.score(left, now) - this.score(right, now),
+    );
+    const victims: CachePolicyEntry<K>[] = [];
+    let selectedBytes = 0;
+
+    for (const entry of ordered) {
+      victims.push(entry);
+      selectedBytes += entry.size;
+
+      if (selectedBytes >= bytesNeeded) break;
+    }
+
+    return victims;
   }
 
   shouldAdmit(candidate: CachePolicyEntry<K>, victim: CachePolicyEntry<K>, now: number): boolean {
