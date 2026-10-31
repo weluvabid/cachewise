@@ -45,7 +45,3 @@ pnpm --filter @cachewise/demo dev
 ```
 
 CI tests Node.js 24 and 26.
-
-## Design
-
-See [docs/design.md](docs/design.md).
