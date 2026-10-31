@@ -65,8 +65,9 @@ jobs:
         run: pnpm --filter cachewise benchmark
 
       - name: Add report to workflow summary
-        if: always() && hashFiles('benchmark-results/report.md') != ''
-        run: cat benchmark-results/report.md >> "$GITHUB_STEP_SUMMARY"
+        if: always() && hashFiles('packages/cachewise/benchmark-results/report.md') != ''
+        run: |
+          cat packages/cachewise/benchmark-results/report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload raw results and summaries
         if: always() && hashFiles('packages/cachewise/benchmark-results/report.json') != ''

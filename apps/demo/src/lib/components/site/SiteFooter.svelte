@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SiGithub } from '@icons-pack/svelte-simple-icons';
-  import { BookOpenText, CircleQuestionMark } from '@lucide/svelte';
+  import { BookOpenText } from '@lucide/svelte';
 </script>
 
 <footer
@@ -35,16 +35,6 @@
       title="Documentation"
     >
       <BookOpenText size={19} aria-hidden="true" />
-    </a>
-    <a
-      class="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground surface-transition active:scale-95 hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-      href="https://github.com/weluvabid/cachewise/wiki"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Cachewise project wiki (opens in a new tab)"
-      title="Wiki"
-    >
-      <CircleQuestionMark size={19} aria-hidden="true" />
     </a>
   </nav>
 </footer>
