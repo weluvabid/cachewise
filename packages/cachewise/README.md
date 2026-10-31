@@ -1,20 +1,28 @@
-# cachewise
+# Cachewise
 
-Computation-aware caching under a predictable logical memory budget.
+In-memory TypeScript cache with a logical byte budget and a cost-aware admission/eviction policy. Also provides an LRU baseline, TTL, async single-flight computation, cancellation, invalidation, disposal hooks, and statistics.
 
-Cachewise is ESM-first and supports Node.js 24+ and modern browsers. The package is not published yet.
+The workspace-level [README](../../README.md) has the project overview and quick example.
 
-```ts
-import { Cache } from 'cachewise';
+## Documentation
 
-const cache = new Cache<string, Uint8Array>({
-  maxBytes: 16 * 1024 * 1024,
-  estimateSize: (value) => value.byteLength,
-});
+- [API reference](../../docs/api.md)
+- [Architecture](../../docs/architecture.md)
+- [Eviction and admission](../../docs/eviction-and-admission.md)
+- [Concurrency](../../docs/concurrency.md)
+- [Memory accounting](../../docs/memory-accounting.md)
+- [Design decisions](../../docs/design-decisions.md)
+- [Benchmarking](../../docs/benchmarking.md)
 
-const result = await cache.getOrCompute('report', async () => createReport(), {
-  computeCost: 20,
-});
+## Development
+
+From the workspace root:
+
+```sh
+pnpm install
+pnpm --filter cachewise test
+pnpm --filter cachewise build
+pnpm --filter cachewise benchmark
 ```
 
-See the repository's `docs/api.md` for the API and accounting semantics.
+The package currently exports ESM and requires Node.js 24 or newer.
