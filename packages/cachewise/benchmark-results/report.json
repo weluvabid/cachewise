@@ -1,0 +1,1017 @@
+{
+  "metadata": {
+    "generatedAt": "2026-10-31T17:06:23.957Z",
+    "node": "v26.13.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "osRelease": "25.2.0",
+    "cpuModel": "Apple M4 Max",
+    "logicalCpuCount": 14,
+    "totalMemoryBytes": 38654705664,
+    "commit": null,
+    "workflowRun": null
+  },
+  "configuration": {
+    "operations": 100000,
+    "capacityBytes": 262144,
+    "trials": 7,
+    "warmups": 2,
+    "workloads": [
+      {
+        "name": "scan-pollution",
+        "purpose": "Protect an expensive hot set near the cache capacity from a high-volume stream of cheap one-off entries."
+      },
+      {
+        "name": "skewed-expensive-reuse",
+        "purpose": "Concentrate expensive recomputation in the frequently reused head of a skewed key distribution."
+      },
+      {
+        "name": "byte-pressure",
+        "purpose": "Prefer compact, expensive-to-recompute entries over large, cheap entries under the same byte budget."
+      }
+    ],
+    "metricsNote": "p50/p95 are percentiles of per-batch average operation time, not individual-operation latency."
+  },
+  "results": [
+    {
+      "workload": "scan-pollution",
+      "purpose": "Protect an expensive hot set near the cache capacity from a high-volume stream of cheap one-off entries.",
+      "policy": "lru",
+      "trials": 7,
+      "hitRatio": {
+        "median": 0.3847,
+        "p25": 0.3847,
+        "p75": 0.3847
+      },
+      "weightedHitRatio": {
+        "median": 0.6383644594777127,
+        "p25": 0.6383644594777127,
+        "p75": 0.6383644594777127
+      },
+      "avoidedCost": {
+        "median": 3847000,
+        "p25": 3847000,
+        "p75": 3847000
+      },
+      "throughputOpsPerSecond": {
+        "median": 1027010.8052525716,
+        "p25": 997801.0958350548,
+        "p75": 1031183.8556783125
+      },
+      "batchLatencyP50Us": {
+        "median": 0.9592499999998836,
+        "p25": 0.9537089999998898,
+        "p75": 0.9614160000000993
+      },
+      "batchLatencyP95Us": {
+        "median": 1.1125420000000759,
+        "p25": 1.0974160000000666,
+        "p75": 1.1312920000000304
+      },
+      "evictions": {
+        "median": 61274,
+        "p25": 61274,
+        "p75": 61274
+      },
+      "rejections": {
+        "median": 0,
+        "p25": 0,
+        "p75": 0
+      },
+      "bytesUsed": {
+        "median": 262144,
+        "p25": 262144,
+        "p75": 262144
+      }
+    },
+    {
+      "workload": "scan-pollution",
+      "purpose": "Protect an expensive hot set near the cache capacity from a high-volume stream of cheap one-off entries.",
+      "policy": "cost-aware",
+      "trials": 7,
+      "hitRatio": {
+        "median": 0.5967,
+        "p25": 0.5967,
+        "p75": 0.5967
+      },
+      "weightedHitRatio": {
+        "median": 0.9901535559406061,
+        "p25": 0.9901535559406061,
+        "p75": 0.9901535559406061
+      },
+      "avoidedCost": {
+        "median": 5967000,
+        "p25": 5967000,
+        "p75": 5967000
+      },
+      "throughputOpsPerSecond": {
+        "median": 965912.9326082547,
+        "p25": 949456.8513399808,
+        "p75": 972113.7032793077
+      },
+      "batchLatencyP50Us": {
+        "median": 1.024417000000085,
+        "p25": 1.0167500000002292,
+        "p75": 1.0402910000000247
+      },
+      "batchLatencyP95Us": {
+        "median": 1.187125000000151,
+        "p25": 1.164209000000028,
+        "p75": 1.2052919999998721
+      },
+      "evictions": {
+        "median": 40074,
+        "p25": 40074,
+        "p75": 40074
+      },
+      "rejections": {
+        "median": 0,
+        "p25": 0,
+        "p75": 0
+      },
+      "bytesUsed": {
+        "median": 262144,
+        "p25": 262144,
+        "p75": 262144
+      }
+    },
+    {
+      "workload": "skewed-expensive-reuse",
+      "purpose": "Concentrate expensive recomputation in the frequently reused head of a skewed key distribution.",
+      "policy": "lru",
+      "trials": 7,
+      "hitRatio": {
+        "median": 0.29612,
+        "p25": 0.29612,
+        "p75": 0.29612
+      },
+      "weightedHitRatio": {
+        "median": 0.5892925108163144,
+        "p25": 0.5892925108163144,
+        "p75": 0.5892925108163144
+      },
+      "avoidedCost": {
+        "median": 1980278,
+        "p25": 1980278,
+        "p75": 1980278
+      },
+      "throughputOpsPerSecond": {
+        "median": 872135.8035451992,
+        "p25": 867496.7430702292,
+        "p75": 881139.109854591
+      },
+      "batchLatencyP50Us": {
+        "median": 1.1404590000001917,
+        "p25": 1.1310840000001008,
+        "p75": 1.1465829999997368
+      },
+      "batchLatencyP95Us": {
+        "median": 1.2316249999998945,
+        "p25": 1.1929159999999683,
+        "p75": 1.2664169999998194
+      },
+      "evictions": {
+        "median": 70203,
+        "p25": 70203,
+        "p75": 70203
+      },
+      "rejections": {
+        "median": 0,
+        "p25": 0,
+        "p75": 0
+      },
+      "bytesUsed": {
+        "median": 261120,
+        "p25": 261120,
+        "p75": 261120
+      }
+    },
+    {
+      "workload": "skewed-expensive-reuse",
+      "purpose": "Concentrate expensive recomputation in the frequently reused head of a skewed key distribution.",
+      "policy": "cost-aware",
+      "trials": 7,
+      "hitRatio": {
+        "median": 0.40422,
+        "p25": 0.40422,
+        "p75": 0.40422
+      },
+      "weightedHitRatio": {
+        "median": 0.9168851156978878,
+        "p25": 0.9168851156978878,
+        "p75": 0.9168851156978878
+      },
+      "avoidedCost": {
+        "median": 3081131,
+        "p25": 3081131,
+        "p75": 3081131
+      },
+      "throughputOpsPerSecond": {
+        "median": 804940.454046946,
+        "p25": 803408.3216182343,
+        "p75": 808958.9485449281
+      },
+      "batchLatencyP50Us": {
+        "median": 1.240708000000268,
+        "p25": 1.2360419999999976,
+        "p75": 1.2474170000000413
+      },
+      "batchLatencyP95Us": {
+        "median": 1.335917000000336,
+        "p25": 1.3325839999997697,
+        "p75": 1.3391670000000886
+      },
+      "evictions": {
+        "median": 10184,
+        "p25": 10184,
+        "p75": 10184
+      },
+      "rejections": {
+        "median": 49192,
+        "p25": 49192,
+        "p75": 49192
+      },
+      "bytesUsed": {
+        "median": 261120,
+        "p25": 261120,
+        "p75": 261120
+      }
+    },
+    {
+      "workload": "byte-pressure",
+      "purpose": "Prefer compact, expensive-to-recompute entries over large, cheap entries under the same byte budget.",
+      "policy": "lru",
+      "trials": 7,
+      "hitRatio": {
+        "median": 0.61781,
+        "p25": 0.61781,
+        "p75": 0.61781
+      },
+      "weightedHitRatio": {
+        "median": 0.8093905575161247,
+        "p25": 0.8093905575161247,
+        "p75": 0.8093905575161247
+      },
+      "avoidedCost": {
+        "median": 4688653,
+        "p25": 4688653,
+        "p75": 4688653
+      },
+      "throughputOpsPerSecond": {
+        "median": 1087057.4526604472,
+        "p25": 1083482.7934643775,
+        "p75": 1098036.8473715107
+      },
+      "batchLatencyP50Us": {
+        "median": 0.9171249999999418,
+        "p25": 0.9089999999996508,
+        "p75": 0.9188749999993888
+      },
+      "batchLatencyP95Us": {
+        "median": 1.0297080000000278,
+        "p25": 1.0233330000000933,
+        "p75": 1.0349169999999503
+      },
+      "evictions": {
+        "median": 38081,
+        "p25": 38081,
+        "p75": 38081
+      },
+      "rejections": {
+        "median": 0,
+        "p25": 0,
+        "p75": 0
+      },
+      "bytesUsed": {
+        "median": 261888,
+        "p25": 261888,
+        "p75": 261888
+      }
+    },
+    {
+      "workload": "byte-pressure",
+      "purpose": "Prefer compact, expensive-to-recompute entries over large, cheap entries under the same byte budget.",
+      "policy": "cost-aware",
+      "trials": 7,
+      "hitRatio": {
+        "median": 0.75201,
+        "p25": 0.75201,
+        "p75": 0.75201
+      },
+      "weightedHitRatio": {
+        "median": 0.9944098028956195,
+        "p25": 0.9944098028956195,
+        "p75": 0.9944098028956195
+      },
+      "avoidedCost": {
+        "median": 5760436,
+        "p25": 5760436,
+        "p75": 5760436
+      },
+      "throughputOpsPerSecond": {
+        "median": 1874774.4412000398,
+        "p25": 1862466.184598334,
+        "p75": 1886835.4584383944
+      },
+      "batchLatencyP50Us": {
+        "median": 0.5309999999999491,
+        "p25": 0.5273329999999987,
+        "p75": 0.5327919999999722
+      },
+      "batchLatencyP95Us": {
+        "median": 0.5835409999999683,
+        "p25": 0.580167000000074,
+        "p75": 0.5872079999999187
+      },
+      "evictions": {
+        "median": 8239,
+        "p25": 8239,
+        "p75": 8239
+      },
+      "rejections": {
+        "median": 16406,
+        "p25": 16406,
+        "p75": 16406
+      },
+      "bytesUsed": {
+        "median": 262144,
+        "p25": 262144,
+        "p75": 262144
+      }
+    }
+  ],
+  "samples": [
+    {
+      "trial": 0,
+      "workload": "scan-pollution",
+      "policy": "lru",
+      "hitRatio": 0.3847,
+      "weightedHitRatio": 0.6383644594777127,
+      "avoidedCost": 3847000,
+      "requestedCost": 6026338,
+      "evictions": 61274,
+      "rejections": 0,
+      "throughputOpsPerSecond": 992263.6477852223,
+      "batchLatencyP50Us": 0.9614160000000993,
+      "batchLatencyP95Us": 1.2390000000000327,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 0,
+      "workload": "scan-pollution",
+      "policy": "cost-aware",
+      "hitRatio": 0.5967,
+      "weightedHitRatio": 0.9901535559406061,
+      "avoidedCost": 5967000,
+      "requestedCost": 6026338,
+      "evictions": 40074,
+      "rejections": 0,
+      "throughputOpsPerSecond": 961264.2609080384,
+      "batchLatencyP50Us": 1.0262910000001284,
+      "batchLatencyP95Us": 1.2052919999998721,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 1,
+      "workload": "scan-pollution",
+      "policy": "cost-aware",
+      "hitRatio": 0.5967,
+      "weightedHitRatio": 0.9901535559406061,
+      "avoidedCost": 5967000,
+      "requestedCost": 6026338,
+      "evictions": 40074,
+      "rejections": 0,
+      "throughputOpsPerSecond": 966818.0036555977,
+      "batchLatencyP50Us": 1.024417000000085,
+      "batchLatencyP95Us": 1.1579999999999018,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 1,
+      "workload": "scan-pollution",
+      "policy": "lru",
+      "hitRatio": 0.3847,
+      "weightedHitRatio": 0.6383644594777127,
+      "avoidedCost": 3847000,
+      "requestedCost": 6026338,
+      "evictions": 61274,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1031183.8556783125,
+      "batchLatencyP50Us": 0.9544579999999314,
+      "batchLatencyP95Us": 1.0974160000000666,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 2,
+      "workload": "scan-pollution",
+      "policy": "lru",
+      "hitRatio": 0.3847,
+      "weightedHitRatio": 0.6383644594777127,
+      "avoidedCost": 3847000,
+      "requestedCost": 6026338,
+      "evictions": 61274,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1023058.8984317663,
+      "batchLatencyP50Us": 0.959583000000066,
+      "batchLatencyP95Us": 1.1125420000000759,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 2,
+      "workload": "scan-pollution",
+      "policy": "cost-aware",
+      "hitRatio": 0.5967,
+      "weightedHitRatio": 0.9901535559406061,
+      "avoidedCost": 5967000,
+      "requestedCost": 6026338,
+      "evictions": 40074,
+      "rejections": 0,
+      "throughputOpsPerSecond": 949456.8513399808,
+      "batchLatencyP50Us": 1.0402910000000247,
+      "batchLatencyP95Us": 1.1950839999999516,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 3,
+      "workload": "scan-pollution",
+      "policy": "cost-aware",
+      "hitRatio": 0.5967,
+      "weightedHitRatio": 0.9901535559406061,
+      "avoidedCost": 5967000,
+      "requestedCost": 6026338,
+      "evictions": 40074,
+      "rejections": 0,
+      "throughputOpsPerSecond": 972944.0507647955,
+      "batchLatencyP50Us": 1.0133330000001024,
+      "batchLatencyP95Us": 1.187125000000151,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 3,
+      "workload": "scan-pollution",
+      "policy": "lru",
+      "hitRatio": 0.3847,
+      "weightedHitRatio": 0.6383644594777127,
+      "avoidedCost": 3847000,
+      "requestedCost": 6026338,
+      "evictions": 61274,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1027010.8052525716,
+      "batchLatencyP50Us": 0.9592499999998836,
+      "batchLatencyP95Us": 1.1151250000000346,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 4,
+      "workload": "scan-pollution",
+      "policy": "lru",
+      "hitRatio": 0.3847,
+      "weightedHitRatio": 0.6383644594777127,
+      "avoidedCost": 3847000,
+      "requestedCost": 6026338,
+      "evictions": 61274,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1037718.4721670953,
+      "batchLatencyP50Us": 0.9485420000000886,
+      "batchLatencyP95Us": 1.0865830000000187,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 4,
+      "workload": "scan-pollution",
+      "policy": "cost-aware",
+      "hitRatio": 0.5967,
+      "weightedHitRatio": 0.9901535559406061,
+      "avoidedCost": 5967000,
+      "requestedCost": 6026338,
+      "evictions": 40074,
+      "rejections": 0,
+      "throughputOpsPerSecond": 965912.9326082547,
+      "batchLatencyP50Us": 1.0167500000002292,
+      "batchLatencyP95Us": 1.1787500000000364,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 5,
+      "workload": "scan-pollution",
+      "policy": "cost-aware",
+      "hitRatio": 0.5967,
+      "weightedHitRatio": 0.9901535559406061,
+      "avoidedCost": 5967000,
+      "requestedCost": 6026338,
+      "evictions": 40074,
+      "rejections": 0,
+      "throughputOpsPerSecond": 972113.7032793077,
+      "batchLatencyP50Us": 1.0215830000001915,
+      "batchLatencyP95Us": 1.164209000000028,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 5,
+      "workload": "scan-pollution",
+      "policy": "lru",
+      "hitRatio": 0.3847,
+      "weightedHitRatio": 0.6383644594777127,
+      "avoidedCost": 3847000,
+      "requestedCost": 6026338,
+      "evictions": 61274,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1029939.9315343301,
+      "batchLatencyP50Us": 0.9537089999998898,
+      "batchLatencyP95Us": 1.1103339999999662,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 6,
+      "workload": "scan-pollution",
+      "policy": "lru",
+      "hitRatio": 0.3847,
+      "weightedHitRatio": 0.6383644594777127,
+      "avoidedCost": 3847000,
+      "requestedCost": 6026338,
+      "evictions": 61274,
+      "rejections": 0,
+      "throughputOpsPerSecond": 997801.0958350548,
+      "batchLatencyP50Us": 0.980583999999908,
+      "batchLatencyP95Us": 1.1312920000000304,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 6,
+      "workload": "scan-pollution",
+      "policy": "cost-aware",
+      "hitRatio": 0.5967,
+      "weightedHitRatio": 0.9901535559406061,
+      "avoidedCost": 5967000,
+      "requestedCost": 6026338,
+      "evictions": 40074,
+      "rejections": 0,
+      "throughputOpsPerSecond": 918361.8386419524,
+      "batchLatencyP50Us": 1.0516250000000582,
+      "batchLatencyP95Us": 1.3528330000003734,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 0,
+      "workload": "skewed-expensive-reuse",
+      "policy": "lru",
+      "hitRatio": 0.29612,
+      "weightedHitRatio": 0.5892925108163144,
+      "avoidedCost": 1980278,
+      "requestedCost": 3360433,
+      "evictions": 70203,
+      "rejections": 0,
+      "throughputOpsPerSecond": 872135.8035451992,
+      "batchLatencyP50Us": 1.1404590000001917,
+      "batchLatencyP95Us": 1.268167000000176,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 0,
+      "workload": "skewed-expensive-reuse",
+      "policy": "cost-aware",
+      "hitRatio": 0.40422,
+      "weightedHitRatio": 0.9168851156978878,
+      "avoidedCost": 3081131,
+      "requestedCost": 3360433,
+      "evictions": 10184,
+      "rejections": 49192,
+      "throughputOpsPerSecond": 794212.049438938,
+      "batchLatencyP50Us": 1.2595409999998992,
+      "batchLatencyP95Us": 1.335917000000336,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 1,
+      "workload": "skewed-expensive-reuse",
+      "policy": "cost-aware",
+      "hitRatio": 0.40422,
+      "weightedHitRatio": 0.9168851156978878,
+      "avoidedCost": 3081131,
+      "requestedCost": 3360433,
+      "evictions": 10184,
+      "rejections": 49192,
+      "throughputOpsPerSecond": 814609.7588326625,
+      "batchLatencyP50Us": 1.228874999999789,
+      "batchLatencyP95Us": 1.3383749999998145,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 1,
+      "workload": "skewed-expensive-reuse",
+      "policy": "lru",
+      "hitRatio": 0.29612,
+      "weightedHitRatio": 0.5892925108163144,
+      "avoidedCost": 1980278,
+      "requestedCost": 3360433,
+      "evictions": 70203,
+      "rejections": 0,
+      "throughputOpsPerSecond": 867496.7430702292,
+      "batchLatencyP50Us": 1.1465829999997368,
+      "batchLatencyP95Us": 1.2316249999998945,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 2,
+      "workload": "skewed-expensive-reuse",
+      "policy": "lru",
+      "hitRatio": 0.29612,
+      "weightedHitRatio": 0.5892925108163144,
+      "avoidedCost": 1980278,
+      "requestedCost": 3360433,
+      "evictions": 70203,
+      "rejections": 0,
+      "throughputOpsPerSecond": 868576.1131250192,
+      "batchLatencyP50Us": 1.1416250000002037,
+      "batchLatencyP95Us": 1.2664169999998194,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 2,
+      "workload": "skewed-expensive-reuse",
+      "policy": "cost-aware",
+      "hitRatio": 0.40422,
+      "weightedHitRatio": 0.9168851156978878,
+      "avoidedCost": 3081131,
+      "requestedCost": 3360433,
+      "evictions": 10184,
+      "rejections": 49192,
+      "throughputOpsPerSecond": 804940.454046946,
+      "batchLatencyP50Us": 1.2474170000000413,
+      "batchLatencyP95Us": 1.318749999999909,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 3,
+      "workload": "skewed-expensive-reuse",
+      "policy": "cost-aware",
+      "hitRatio": 0.40422,
+      "weightedHitRatio": 0.9168851156978878,
+      "avoidedCost": 3081131,
+      "requestedCost": 3360433,
+      "evictions": 10184,
+      "rejections": 49192,
+      "throughputOpsPerSecond": 804433.2315390103,
+      "batchLatencyP50Us": 1.2365420000000995,
+      "batchLatencyP95Us": 1.3391670000000886,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 3,
+      "workload": "skewed-expensive-reuse",
+      "policy": "lru",
+      "hitRatio": 0.29612,
+      "weightedHitRatio": 0.5892925108163144,
+      "avoidedCost": 1980278,
+      "requestedCost": 3360433,
+      "evictions": 70203,
+      "rejections": 0,
+      "throughputOpsPerSecond": 882834.9326976957,
+      "batchLatencyP50Us": 1.1274170000001504,
+      "batchLatencyP95Us": 1.191208000000188,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 4,
+      "workload": "skewed-expensive-reuse",
+      "policy": "lru",
+      "hitRatio": 0.29612,
+      "weightedHitRatio": 0.5892925108163144,
+      "avoidedCost": 1980278,
+      "requestedCost": 3360433,
+      "evictions": 70203,
+      "rejections": 0,
+      "throughputOpsPerSecond": 866345.9211489717,
+      "batchLatencyP50Us": 1.1491669999995793,
+      "batchLatencyP95Us": 1.2163329999998496,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 4,
+      "workload": "skewed-expensive-reuse",
+      "policy": "cost-aware",
+      "hitRatio": 0.40422,
+      "weightedHitRatio": 0.9168851156978878,
+      "avoidedCost": 3081131,
+      "requestedCost": 3360433,
+      "evictions": 10184,
+      "rejections": 49192,
+      "throughputOpsPerSecond": 805024.4214623568,
+      "batchLatencyP50Us": 1.2440000000001419,
+      "batchLatencyP95Us": 1.3424999999997453,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 5,
+      "workload": "skewed-expensive-reuse",
+      "policy": "cost-aware",
+      "hitRatio": 0.40422,
+      "weightedHitRatio": 0.9168851156978878,
+      "avoidedCost": 3081131,
+      "requestedCost": 3360433,
+      "evictions": 10184,
+      "rejections": 49192,
+      "throughputOpsPerSecond": 808958.9485449281,
+      "batchLatencyP50Us": 1.2360419999999976,
+      "batchLatencyP95Us": 1.3345839999997224,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 5,
+      "workload": "skewed-expensive-reuse",
+      "policy": "lru",
+      "hitRatio": 0.29612,
+      "weightedHitRatio": 0.5892925108163144,
+      "avoidedCost": 1980278,
+      "requestedCost": 3360433,
+      "evictions": 70203,
+      "rejections": 0,
+      "throughputOpsPerSecond": 881139.109854591,
+      "batchLatencyP50Us": 1.1339160000002266,
+      "batchLatencyP95Us": 1.1929159999999683,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 6,
+      "workload": "skewed-expensive-reuse",
+      "policy": "lru",
+      "hitRatio": 0.29612,
+      "weightedHitRatio": 0.5892925108163144,
+      "avoidedCost": 1980278,
+      "requestedCost": 3360433,
+      "evictions": 70203,
+      "rejections": 0,
+      "throughputOpsPerSecond": 876962.2029290522,
+      "batchLatencyP50Us": 1.1310840000001008,
+      "batchLatencyP95Us": 1.2367080000003625,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 6,
+      "workload": "skewed-expensive-reuse",
+      "policy": "cost-aware",
+      "hitRatio": 0.40422,
+      "weightedHitRatio": 0.9168851156978878,
+      "avoidedCost": 3081131,
+      "requestedCost": 3360433,
+      "evictions": 10184,
+      "rejections": 49192,
+      "throughputOpsPerSecond": 803408.3216182343,
+      "batchLatencyP50Us": 1.240708000000268,
+      "batchLatencyP95Us": 1.3325839999997697,
+      "bytesUsed": 261120,
+      "bytesAvailable": 1024
+    },
+    {
+      "trial": 0,
+      "workload": "byte-pressure",
+      "policy": "lru",
+      "hitRatio": 0.61781,
+      "weightedHitRatio": 0.8093905575161247,
+      "avoidedCost": 4688653,
+      "requestedCost": 5792819,
+      "evictions": 38081,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1083482.7934643775,
+      "batchLatencyP50Us": 0.918707999999242,
+      "batchLatencyP95Us": 1.0349169999999503,
+      "bytesUsed": 261888,
+      "bytesAvailable": 256
+    },
+    {
+      "trial": 0,
+      "workload": "byte-pressure",
+      "policy": "cost-aware",
+      "hitRatio": 0.75201,
+      "weightedHitRatio": 0.9944098028956195,
+      "avoidedCost": 5760436,
+      "requestedCost": 5792819,
+      "evictions": 8239,
+      "rejections": 16406,
+      "throughputOpsPerSecond": 1859499.3528570351,
+      "batchLatencyP50Us": 0.5379999999995562,
+      "batchLatencyP95Us": 0.580167000000074,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 1,
+      "workload": "byte-pressure",
+      "policy": "cost-aware",
+      "hitRatio": 0.75201,
+      "weightedHitRatio": 0.9944098028956195,
+      "avoidedCost": 5760436,
+      "requestedCost": 5792819,
+      "evictions": 8239,
+      "rejections": 16406,
+      "throughputOpsPerSecond": 1876856.3399540968,
+      "batchLatencyP50Us": 0.5273329999999987,
+      "batchLatencyP95Us": 0.5944580000004862,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 1,
+      "workload": "byte-pressure",
+      "policy": "lru",
+      "hitRatio": 0.61781,
+      "weightedHitRatio": 0.8093905575161247,
+      "avoidedCost": 4688653,
+      "requestedCost": 5792819,
+      "evictions": 38081,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1090185.1049273773,
+      "batchLatencyP50Us": 0.9171249999999418,
+      "batchLatencyP95Us": 1.0399999999999636,
+      "bytesUsed": 261888,
+      "bytesAvailable": 256
+    },
+    {
+      "trial": 2,
+      "workload": "byte-pressure",
+      "policy": "lru",
+      "hitRatio": 0.61781,
+      "weightedHitRatio": 0.8093905575161247,
+      "avoidedCost": 4688653,
+      "requestedCost": 5792819,
+      "evictions": 38081,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1099625.6192624127,
+      "batchLatencyP50Us": 0.9089999999996508,
+      "batchLatencyP95Us": 1.0171659999996336,
+      "bytesUsed": 261888,
+      "bytesAvailable": 256
+    },
+    {
+      "trial": 2,
+      "workload": "byte-pressure",
+      "policy": "cost-aware",
+      "hitRatio": 0.75201,
+      "weightedHitRatio": 0.9944098028956195,
+      "avoidedCost": 5760436,
+      "requestedCost": 5792819,
+      "evictions": 8239,
+      "rejections": 16406,
+      "throughputOpsPerSecond": 1874774.4412000398,
+      "batchLatencyP50Us": 0.5309999999999491,
+      "batchLatencyP95Us": 0.5849580000003698,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 3,
+      "workload": "byte-pressure",
+      "policy": "cost-aware",
+      "hitRatio": 0.75201,
+      "weightedHitRatio": 0.9944098028956195,
+      "avoidedCost": 5760436,
+      "requestedCost": 5792819,
+      "evictions": 8239,
+      "rejections": 16406,
+      "throughputOpsPerSecond": 1870965.7418127742,
+      "batchLatencyP50Us": 0.5324590000000171,
+      "batchLatencyP95Us": 0.5872079999999187,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 3,
+      "workload": "byte-pressure",
+      "policy": "lru",
+      "hitRatio": 0.61781,
+      "weightedHitRatio": 0.8093905575161247,
+      "avoidedCost": 4688653,
+      "requestedCost": 5792819,
+      "evictions": 38081,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1082261.8228797761,
+      "batchLatencyP50Us": 0.9236660000005941,
+      "batchLatencyP95Us": 1.0264589999997042,
+      "bytesUsed": 261888,
+      "bytesAvailable": 256
+    },
+    {
+      "trial": 4,
+      "workload": "byte-pressure",
+      "policy": "lru",
+      "hitRatio": 0.61781,
+      "weightedHitRatio": 0.8093905575161247,
+      "avoidedCost": 4688653,
+      "requestedCost": 5792819,
+      "evictions": 38081,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1085475.7911761766,
+      "batchLatencyP50Us": 0.9163330000001224,
+      "batchLatencyP95Us": 1.0344590000004246,
+      "bytesUsed": 261888,
+      "bytesAvailable": 256
+    },
+    {
+      "trial": 4,
+      "workload": "byte-pressure",
+      "policy": "cost-aware",
+      "hitRatio": 0.75201,
+      "weightedHitRatio": 0.9944098028956195,
+      "avoidedCost": 5760436,
+      "requestedCost": 5792819,
+      "evictions": 8239,
+      "rejections": 16406,
+      "throughputOpsPerSecond": 1862466.184598334,
+      "batchLatencyP50Us": 0.5327919999999722,
+      "batchLatencyP95Us": 0.5824579999998605,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 5,
+      "workload": "byte-pressure",
+      "policy": "cost-aware",
+      "hitRatio": 0.75201,
+      "weightedHitRatio": 0.9944098028956195,
+      "avoidedCost": 5760436,
+      "requestedCost": 5792819,
+      "evictions": 8239,
+      "rejections": 16406,
+      "throughputOpsPerSecond": 1886835.4584383944,
+      "batchLatencyP50Us": 0.528041999999914,
+      "batchLatencyP95Us": 0.5835409999999683,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    },
+    {
+      "trial": 5,
+      "workload": "byte-pressure",
+      "policy": "lru",
+      "hitRatio": 0.61781,
+      "weightedHitRatio": 0.8093905575161247,
+      "avoidedCost": 4688653,
+      "requestedCost": 5792819,
+      "evictions": 38081,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1087057.4526604472,
+      "batchLatencyP50Us": 0.9188749999993888,
+      "batchLatencyP95Us": 1.0297080000000278,
+      "bytesUsed": 261888,
+      "bytesAvailable": 256
+    },
+    {
+      "trial": 6,
+      "workload": "byte-pressure",
+      "policy": "lru",
+      "hitRatio": 0.61781,
+      "weightedHitRatio": 0.8093905575161247,
+      "avoidedCost": 4688653,
+      "requestedCost": 5792819,
+      "evictions": 38081,
+      "rejections": 0,
+      "throughputOpsPerSecond": 1098036.8473715107,
+      "batchLatencyP50Us": 0.9083339999997406,
+      "batchLatencyP95Us": 1.0233330000000933,
+      "bytesUsed": 261888,
+      "bytesAvailable": 256
+    },
+    {
+      "trial": 6,
+      "workload": "byte-pressure",
+      "policy": "cost-aware",
+      "hitRatio": 0.75201,
+      "weightedHitRatio": 0.9944098028956195,
+      "avoidedCost": 5760436,
+      "requestedCost": 5792819,
+      "evictions": 8239,
+      "rejections": 16406,
+      "throughputOpsPerSecond": 1899402.875221113,
+      "batchLatencyP50Us": 0.5251250000001164,
+      "batchLatencyP95Us": 0.5626250000004802,
+      "bytesUsed": 262144,
+      "bytesAvailable": 0
+    }
+  ]
+}

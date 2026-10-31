@@ -1,3 +1,6 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { cpus, release, totalmem } from 'node:os';
+import { dirname, resolve } from 'node:path';
 import { Cache } from '../dist/index.js';
 
 const OPERATIONS = Number(process.env.CACHEWISE_BENCH_OPERATIONS ?? 100_000);
@@ -220,21 +223,115 @@ const table = results.map((result) => ({
   rejections: result.rejections.median.toFixed(0),
 }));
 
+const cpu = cpus()[0];
+const report = {
+  metadata: {
+    generatedAt: new Date().toISOString(),
+    node: process.version,
+    platform: process.platform,
+    architecture: process.arch,
+    osRelease: release(),
+    cpuModel: cpu?.model ?? 'unknown',
+    logicalCpuCount: cpus().length,
+    totalMemoryBytes: totalmem(),
+    commit: process.env.GITHUB_SHA ?? null,
+    workflowRun: process.env.GITHUB_RUN_ID ?? null,
+  },
+  configuration: {
+    operations: OPERATIONS,
+    capacityBytes: CAPACITY,
+    trials: TRIALS,
+    warmups: WARMUPS,
+    workloads: workloads.map(({ name, purpose }) => ({ name, purpose })),
+    metricsNote:
+      'p50/p95 are percentiles of per-batch average operation time, not individual-operation latency.',
+  },
+  results,
+  samples,
+};
+
+const csvFields = [
+  'trial',
+  'workload',
+  'policy',
+  'hitRatio',
+  'weightedHitRatio',
+  'avoidedCost',
+  'requestedCost',
+  'throughputOpsPerSecond',
+  'batchLatencyP50Us',
+  'batchLatencyP95Us',
+  'evictions',
+  'rejections',
+  'bytesUsed',
+  'bytesAvailable',
+];
+const csvEscape = (value) => {
+  const text = String(value ?? '');
+  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+};
+const csv = [
+  csvFields.join(','),
+  ...samples.map((sample) => csvFields.map((field) => csvEscape(sample[field])).join(',')),
+].join('\n');
+
+const markdown = [
+  '# Cachewise benchmark report',
+  '',
+  `- Generated: ${report.metadata.generatedAt}`,
+  `- Commit: ${report.metadata.commit ?? 'local run'}`,
+  `- Runtime: ${report.metadata.node} (${report.metadata.platform}/${report.metadata.architecture})`,
+  `- CPU: ${report.metadata.cpuModel} (${report.metadata.logicalCpuCount} logical cores)`,
+  `- Operations per trial: ${OPERATIONS.toLocaleString('en-US')}`,
+  `- Capacity: ${CAPACITY.toLocaleString('en-US')} bytes`,
+  `- Measured trials per workload/policy: ${TRIALS}`,
+  `- Warm-up trials per workload/policy: ${WARMUPS}`,
+  '',
+  '| Workload | Policy | Weighted hit | Avoided cost | Raw hit | Ops/sec | Batch p50 (µs) | Batch p95 (µs) | Rejections |',
+  '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
+  ...results
+    .map((result) =>
+      [
+        result.workload,
+        result.policy,
+        `${(result.weightedHitRatio.median * 100).toFixed(2)}%`,
+        result.avoidedCost.median.toFixed(0),
+        `${(result.hitRatio.median * 100).toFixed(2)}%`,
+        result.throughputOpsPerSecond.median.toFixed(0),
+        result.batchLatencyP50Us.median.toFixed(3),
+        result.batchLatencyP95Us.median.toFixed(3),
+        result.rejections.median.toFixed(0),
+      ].join(' | '),
+    )
+    .map((row) => `| ${row} |`),
+  '',
+  'Values are medians across measured trials. Raw per-trial observations are in `report.json` and `samples.csv`.',
+  '',
+  report.configuration.metricsNote,
+  '',
+].join('\n');
+
+const outputPath = process.env.CACHEWISE_BENCH_OUTPUT;
+
+if (outputPath) {
+  const absolutePath = resolve(outputPath);
+  const outputDirectory = dirname(absolutePath);
+  mkdirSync(outputDirectory, { recursive: true });
+  const outputBase = absolutePath.replace(/\.json$/i, '');
+  writeFileSync(`${outputBase}.json`, `${JSON.stringify(report, null, 2)}\n`);
+  writeFileSync(`${outputBase}.csv`, `${csv}\n`);
+  writeFileSync(`${outputBase}.md`, markdown);
+}
+
 // eslint-disable-next-line no-console
 console.table(table);
 // eslint-disable-next-line no-console
 console.log(
   JSON.stringify(
     {
-      configuration: {
-        operations: OPERATIONS,
-        capacityBytes: CAPACITY,
-        trials: TRIALS,
-        warmups: WARMUPS,
-        metricsNote:
-          'p50/p95 are percentiles of per-batch average operation time, not individual-operation latency.',
-      },
-      results,
+      metadata: report.metadata,
+      configuration: report.configuration,
+      output: outputPath ? resolve(outputPath) : null,
     },
     null,
     2,

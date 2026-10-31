@@ -13,6 +13,15 @@ pnpm --filter cachewise benchmark
 
 The package benchmark script builds the TypeScript package before running `packages/cachewise/benchmarks/run.mjs`.
 
+To save a local machine-readable report as well:
+
+```sh
+CACHEWISE_BENCH_OUTPUT=benchmark-results/report.json \
+  pnpm --filter cachewise benchmark
+```
+
+This writes `report.json` (including every trial and environment metadata), `report.csv` (one row per measured trial), and `report.md` (a compact summary).
+
 Configuration is available through environment variables:
 
 ```sh
@@ -59,3 +68,24 @@ The benchmark is not a universal winner-takes-all score. The useful question is 
 This is a deterministic microbenchmark, not a production trace replay. Results still depend on Node.js version, CPU scheduling, JIT compilation, garbage collection, and machine load. Run it on an otherwise idle machine and compare medians and percentile ranges rather than relying on a single run. For a release claim, retain the JSON output with the Node version, CPU, capacity, operation count, and trial count.
 
 The benchmark does not include real recomputation, heap profiling, multi-process contention, or application-specific traces. `maxBytes` is a logical value budget, not a measurement of process memory.
+
+## Run on GitHub Actions
+
+The repository includes a manually triggered workflow at **Actions → Cachewise benchmark → Run workflow**. It runs on a GitHub-hosted Ubuntu runner with Node.js 26 and pnpm 12.
+
+The default run uses:
+
+- 100,000 operations per workload and policy trial.
+- 256 KiB logical cache capacity.
+- 100 measured trials per workload and policy.
+- 10 warm-up trials per workload and policy.
+
+The workflow runs the policies sequentially and alternates their order between measured trials. It uploads a `benchmark-results` artifact containing:
+
+- `report.json` — environment metadata, configuration, summary statistics, and every raw trial.
+- `samples.csv` — one row per measured workload/policy/trial, suitable for further analysis.
+- `report.md` — a compact summary also copied into the GitHub Actions run summary.
+
+Artifacts are retained for 90 days. You can change the operation count, capacity, measured trials, and warm-ups when manually dispatching the workflow. The benchmark runner validates that these values are positive safe integers.
+
+GitHub-hosted runners are convenient for repeatable automated runs, but they are not dedicated hardware. CPU models and host load can vary between workflow runs. Compare policies within the same run first; use repeated workflow runs before making claims about changes across commits. The report records the runtime, operating system, CPU model, logical CPU count, memory, and commit SHA to make those comparisons easier to interpret.

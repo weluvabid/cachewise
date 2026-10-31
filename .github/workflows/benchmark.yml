@@ -1,0 +1,78 @@
+name: Cachewise benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      operations:
+        description: Operations per workload and policy trial
+        required: true
+        default: '100000'
+        type: string
+      capacity:
+        description: Logical cache capacity in bytes
+        required: true
+        default: '262144'
+        type: string
+      trials:
+        description: Measured trials per workload and policy
+        required: true
+        default: '100'
+        type: string
+      warmups:
+        description: Warm-up trials per workload and policy
+        required: true
+        default: '10'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cachewise-benchmark-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    name: Run reproducible benchmark suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.0.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run benchmark
+        env:
+          CACHEWISE_BENCH_OPERATIONS: ${{ inputs.operations }}
+          CACHEWISE_BENCH_CAPACITY: ${{ inputs.capacity }}
+          CACHEWISE_BENCH_TRIALS: ${{ inputs.trials }}
+          CACHEWISE_BENCH_WARMUPS: ${{ inputs.warmups }}
+          CACHEWISE_BENCH_OUTPUT: benchmark-results/report.json
+        run: pnpm --filter cachewise benchmark
+
+      - name: Add report to workflow summary
+        if: always() && hashFiles('benchmark-results/report.md') != ''
+        run: cat benchmark-results/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload raw results and summaries
+        if: always() && hashFiles('benchmark-results/report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: cachewise-benchmark-${{ github.run_id }}-${{ github.run_attempt }}
+          path: benchmark-results/
+          if-no-files-found: error
+          retention-days: 90
