@@ -21,13 +21,13 @@ Cachewise is designed for one JavaScript agent. It is not a distributed cache, a
 ## Install
 
 ```sh
-pnpm add cachewise
+pnpm add @weluvabid/cachewise
 ```
 
 ## Quick start
 
 ```ts
-import { Cache } from 'cachewise';
+import { Cache } from '@weluvabid/cachewise';
 
 const cache = new Cache<string, Uint8Array>({
   maxBytes: 16 * 1024 * 1024,
@@ -89,7 +89,7 @@ pnpm check
 Run the benchmark suite after building the package:
 
 ```sh
-pnpm --filter cachewise benchmark
+pnpm --filter @weluvabid/cachewise benchmark
 ```
 
 The benchmark suite compares the cost-aware policy with LRU under three deterministic workloads: scan pollution, skewed expensive reuse, and byte pressure. See [Benchmarking](docs/benchmarking.md) for methodology and limitations.

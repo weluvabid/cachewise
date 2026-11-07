@@ -21,7 +21,7 @@ From the workspace root:
 ```sh
 pnpm install
 pnpm check
-pnpm --filter cachewise benchmark
+pnpm --filter @weluvabid/cachewise benchmark
 ```
 
 The benchmark command builds the package before running the deterministic workload suite. See the benchmarking guide for its metrics and limitations.

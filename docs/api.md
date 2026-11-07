@@ -3,7 +3,7 @@
 ## `new Cache<K, V>(options)`
 
 ```ts
-import { Cache } from 'cachewise';
+import { Cache } from '@weluvabid/cachewise';
 
 const cache = new Cache<string, Uint8Array>({
   maxBytes: 32 * 1024 * 1024,

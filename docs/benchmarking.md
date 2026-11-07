@@ -8,7 +8,7 @@ From the workspace root:
 
 ```sh
 pnpm install
-pnpm --filter cachewise benchmark
+pnpm --filter @weluvabid/cachewise benchmark
 ```
 
 The package benchmark script builds the TypeScript package before running `packages/cachewise/benchmarks/run.mjs`.
@@ -17,7 +17,7 @@ To save a local machine-readable report as well:
 
 ```sh
 CACHEWISE_BENCH_OUTPUT=benchmark-results/report.json \
-  pnpm --filter cachewise benchmark
+  pnpm --filter @weluvabid/cachewise benchmark
 ```
 
 This writes `report.json` (including every trial and environment metadata), `report.csv` (one row per measured trial), and `report.md` (a compact summary).
@@ -29,7 +29,7 @@ CACHEWISE_BENCH_OPERATIONS=250000 \
 CACHEWISE_BENCH_CAPACITY=524288 \
 CACHEWISE_BENCH_TRIALS=20 \
 CACHEWISE_BENCH_WARMUPS=3 \
-pnpm --filter cachewise benchmark
+pnpm --filter @weluvabid/cachewise benchmark
 ```
 
 Defaults are 100,000 operations, a 256 KiB logical budget, seven measured trials, and two warm-up runs per policy and workload. Policy order alternates between trials. Each run uses a deterministic workload and a logical clock so recency and frequency aging do not depend on wall-clock scheduling.

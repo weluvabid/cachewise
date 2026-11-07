@@ -7,15 +7,15 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "pnpm --filter cachewise build",
+    "build": "pnpm --filter @weluvabid/cachewise build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm --filter cachewise test",
-    "test:coverage": "pnpm --filter cachewise test:coverage",
-    "check:package": "pnpm --filter cachewise check:package",
+    "test": "pnpm --filter @weluvabid/cachewise test",
+    "test:coverage": "pnpm --filter @weluvabid/cachewise test:coverage",
+    "check:package": "pnpm --filter @weluvabid/cachewise check:package",
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm build && pnpm check:package",
     "prepare": "simple-git-hooks"
   },

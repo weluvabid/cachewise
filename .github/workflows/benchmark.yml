@@ -62,7 +62,7 @@ jobs:
           CACHEWISE_BENCH_TRIALS: ${{ inputs.trials }}
           CACHEWISE_BENCH_WARMUPS: ${{ inputs.warmups }}
           CACHEWISE_BENCH_OUTPUT: benchmark-results/report.json
-        run: pnpm --filter cachewise benchmark
+        run: pnpm --filter @weluvabid/cachewise benchmark
 
       - name: Add report to workflow summary
         if: always() && hashFiles('packages/cachewise/benchmark-results/report.md') != ''
