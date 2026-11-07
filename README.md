@@ -76,6 +76,7 @@ When capacity is needed, Cachewise plans a victim set before changing the cache.
 - [Memory accounting](docs/memory-accounting.md) — estimator behavior and budget boundaries
 - [Design decisions](docs/design-decisions.md) — implementation trade-offs and constraints
 - [Benchmarking](docs/benchmarking.md) — workloads, metrics, and interpretation
+- [Releasing](docs/releasing.md) — Changesets, version tags, npm publication, and GitHub Releases
 
 ## Development
 

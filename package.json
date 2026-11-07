@@ -44,6 +44,7 @@
     "*.{ts,tsx,js,mjs,cjs}": "eslint --fix"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged"
+    "pre-commit": "pnpm exec lint-staged",
+    "pre-push": "pnpm check"
   }
 }
