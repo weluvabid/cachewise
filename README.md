@@ -2,23 +2,29 @@
 
 **Recompute less. Remember smarter.**
 
-Cachewise is a TypeScript in-memory cache with a logical byte budget. The default policy looks at four things when deciding what to keep: how recently a value was used, how often it has been reused, how expensive it is to recompute, and how much space it occupies. An LRU policy is also available as a baseline.
+Cachewise is a TypeScript in-memory cache with a logical byte budget and cost-aware retention. Its default policy considers four signals: recency, estimated reuse frequency, caller-supplied recomputation cost, and logical entry size. An LRU policy is available as a baseline.
 
-The core idea is simple: when the cache is full, the entry used least recently is not always the cheapest one to lose.
+The distinction matters when entries have different costs. The least recently used value is not necessarily the least valuable one to retain: a compact result that is expensive to rebuild may be a better use of the budget than a large, cheap value accessed more recently.
 
-## What it provides
+Cachewise is designed for one JavaScript agent. It is not a distributed cache, and `maxBytes` is an accounting budget for cached values rather than a hard limit on JavaScript heap or process memory.
 
-- Cost-aware admission and eviction, plus an explicit LRU baseline
-- Logical byte budget with caller-provided size estimates
+## Capabilities
+
+- Cost-aware admission and eviction, with an explicit LRU policy
+- Caller-defined logical size estimates and a bounded byte budget
 - TTL expiration, explicit deletion, and manual expiration pruning
-- Per-key single-flight async computation
-- Per-caller cancellation that does not cancel other waiters
-- Protection against stale factory results after `delete`, `set`, or `clear`
-- Disposal callbacks, events, entry metadata, and aggregate statistics
+- Per-key single-flight asynchronous computation
+- Per-caller cancellation without cancelling other waiters
+- Protection against stale factory results after `set`, `delete`, or `clear`
+- Disposal callbacks, synchronous events, entry metadata, and aggregate statistics
 
-Cachewise is an in-memory cache for a single JavaScript agent. It is not a distributed cache. The byte budget is an accounting limit, not a hard JavaScript heap limit.
+## Install
 
-## Quick example
+```sh
+pnpm add cachewise
+```
+
+## Quick start
 
 ```ts
 import { Cache } from 'cachewise';
@@ -47,47 +53,46 @@ const report = await cache.getOrCompute(
 );
 ```
 
-`computeCost` is a relative weight you supply. It is not measured in milliseconds automatically. Keep the scale consistent inside a given cache instance.
+`computeCost` is a relative weight supplied by the application. Cachewise does not measure execution time or infer the cost of recomputation. Use a consistent scale within a cache instance. The `estimateSize` callback serves the same purpose for logical size: it lets the application choose an accounting convention that fits its values.
 
-## How retention works
+## Retention policy
 
-The cost-aware policy scores an entry like this:
+The cost-aware policy assigns each entry a score based on its current state:
 
 ```text
 score = (recency × log2(1 + frequency) × log2(1 + computeCost)) / size
 ```
 
-Recency decays over time. Larger entries have to justify more of the budget. When space is needed, the policy looks at the lowest-scoring entry and admits the candidate only if its score is at least as high.
+Recency decays over time, frequency is an approximate bounded estimate, and the logarithms limit the influence of very large frequency and cost weights. Dividing by size favours entries that provide more estimated reuse value per logical byte.
 
-This is a heuristic, not a claim of optimal caching. The [eviction and admission notes](docs/eviction-and-admission.md) explain the formula and its limits.
+When capacity is needed, Cachewise plans a victim set before changing the cache. The candidate must justify displacing the selected entries; otherwise the insertion is rejected and the existing entries remain in place. This is a heuristic, not an optimal policy or a prediction of future access patterns. The [eviction and admission guide](docs/eviction-and-admission.md) describes the calculation and its limits.
 
 ## Documentation
 
-- [Architecture](docs/architecture.md)
-- [API reference](docs/api.md)
-- [Eviction and admission](docs/eviction-and-admission.md)
-- [Concurrency and async computation](docs/concurrency.md)
-- [Memory accounting](docs/memory-accounting.md)
-- [Design decisions and trade-offs](docs/design-decisions.md)
-- [Benchmark methodology](docs/benchmarking.md)
+- [Architecture](docs/architecture.md) — runtime components, insertion path, and complexity
+- [API reference](docs/api.md) — constructor options, methods, events, and disposal
+- [Eviction and admission](docs/eviction-and-admission.md) — scoring, victim selection, and admission
+- [Concurrency](docs/concurrency.md) — single-flight lifecycle, cancellation, and invalidation
+- [Memory accounting](docs/memory-accounting.md) — estimator behavior and budget boundaries
+- [Design decisions](docs/design-decisions.md) — implementation trade-offs and constraints
+- [Benchmarking](docs/benchmarking.md) — workloads, metrics, and interpretation
 
 ## Development
 
-Requires Node.js 24+ and pnpm 12.
+Requires Node.js 24 or later and pnpm 12.
 
 ```sh
 pnpm install
 pnpm check
-pnpm --filter @cachewise/demo dev
 ```
 
-Run the benchmark suite after building:
+Run the benchmark suite after building the package:
 
 ```sh
 pnpm --filter cachewise benchmark
 ```
 
-The benchmark focuses on expensive hot-set protection under scan pollution, skewed expensive reuse, and mixed-size byte pressure. It reports repeated-trial medians and percentile ranges, with weighted hit ratio as the primary outcome. See [Benchmarking](docs/benchmarking.md) for workload definitions and how to read the numbers.
+The benchmark suite compares the cost-aware policy with LRU under three deterministic workloads: scan pollution, skewed expensive reuse, and byte pressure. See [Benchmarking](docs/benchmarking.md) for methodology and limitations.
 
 ## License
 

@@ -13,7 +13,7 @@ const cache = new Cache<string, Uint8Array>({
 });
 ```
 
-`K` must be a `CacheKey` (`string | number | symbol | object`).
+`K` must satisfy `CacheKey`: `string | number | symbol | object`.
 
 | Option               | Default            | Meaning                                                                                                                              |
 | -------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
@@ -47,7 +47,7 @@ cache.set('compiled:template', compiledTemplate, {
 | `computeCost` | Relative recomputation-cost weight used by the cost-aware policy.                   |
 | `ttl`         | Per-entry TTL in milliseconds; overrides the default when supplied.                 |
 
-`set` returns `true` when the candidate is retained and `false` when it is rejected. Invalid sizes, costs, TTLs, and budgets throw `RangeError`.
+`set` returns `true` when the candidate is retained and `false` when admission rejects it. Invalid sizes, costs, TTLs, and budgets throw `RangeError`.
 
 An entry larger than the entire budget is rejected. Under the cost-aware policy, a candidate can also be rejected when its score does not justify displacing the selected victim. A rejected insertion leaves the existing entry set intact.
 

@@ -1,6 +1,6 @@
 # Memory accounting
 
-`maxBytes` is a logical accounting budget. It is not a hard limit on JavaScript heap usage or process resident memory.
+`maxBytes` limits the sum of the logical sizes assigned to retained values. It does not cap JavaScript heap usage or process resident memory.
 
 `maxBytes` must be a positive safe integer. Cachewise tracks the charged size of each retained entry and ensures the sum does not exceed that budget. The estimate does not include the `Map`, entry metadata, keys, promise state, closures, the fixed frequency sketch (four `Uint8Array` rows, one byte per counter, plus a bounded object-key identity table), allocator overhead, or garbage-collector fragmentation. With the default width of 8,192, the sketch uses 32 KiB for counters, plus small object metadata.
 
@@ -49,4 +49,4 @@ An estimator may return zero, but Cachewise charges every retained entry at leas
 
 ## Choosing a budget
 
-Treat `maxBytes` as a policy budget for values, not as a process memory safety mechanism. Leave room for application data structures and runtime overhead. If you need a strict heap ceiling, enforce it at the process or worker level and use realistic application-specific size estimates.
+Use `maxBytes` as a retention-policy budget for values, not as a process memory safety mechanism. Reserve additional memory for application data structures and runtime overhead. If the process needs a strict memory ceiling, enforce it at the process or worker level and provide estimates that reflect the values stored by the application.

@@ -1,6 +1,6 @@
 # Design decisions
 
-This page records the behavior visible in the current implementation. It is not a claim that every choice is the only reasonable one.
+This page records the implementation choices that affect observable behavior, along with the trade-offs they introduce. These choices are specific to the current implementation; alternatives may be appropriate for different workloads.
 
 ## Logical byte budget
 
@@ -30,7 +30,7 @@ Concurrent callers share one factory execution, but each caller owns its own wai
 
 TTL is checked on access and by `pruneExpired()`. An idle expired entry can remain in the map and continue contributing to `bytesUsed` until it is accessed or pruned. This avoids a timer per entry and keeps lifecycle behavior explicit.
 
-## Current trade-offs
+## Trade-offs and constraints
 
 - Admission planning scans entries and allocates temporary collections. It favors a straightforward implementation over an indexed eviction structure.
 - The cost-aware recency half-life is currently fixed internally at 60 seconds.
@@ -38,4 +38,4 @@ TTL is checked on access and by `pruneExpired()`. An idle expired entry can rema
 - Exceptions from disposal and event callbacks are isolated and can be observed through `onCallbackError`. Exceptions from the error handler itself are swallowed so they cannot corrupt cache state transitions.
 - `maxBytes` must be a positive safe integer. Rejecting fractional budgets avoids silently turning a positive sub-byte budget into zero or flooring caller input unexpectedly.
 
-These details matter when deciding whether Cachewise fits a workload. The logical value budget and bounded frequency sketch do not imply a strict process-heap ceiling. The active flight map is bounded by concurrent computations, and invalidation metadata is retained only for those active flights.
+These constraints should be considered when evaluating Cachewise for a workload. The logical value budget and bounded frequency sketch do not impose a process-heap ceiling. The flight map grows with the number of concurrent computations, while invalidation metadata exists only for active flights.

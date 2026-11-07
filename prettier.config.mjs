@@ -5,6 +5,4 @@ export default {
   printWidth: 100,
   tabWidth: 2,
   useTabs: false,
-  plugins: ['prettier-plugin-svelte'],
-  overrides: [{ files: '*.svelte', options: { parser: 'svelte' } }],
 };

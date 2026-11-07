@@ -1,6 +1,6 @@
 # Benchmarking
 
-The benchmark is built around what Cachewise is meant to do: retain entries that avoid expensive recomputation when memory is constrained and access patterns are not uniform. LRU is measured against the same deterministic request stream as a baseline. The suite is not designed to make the two policies look equally good.
+The benchmark compares the cost-aware policy with LRU under deterministic request streams that vary reuse, recomputation-cost weights, and entry sizes. Both policies receive the same stream and logical capacity. The workloads are deliberately targeted at the retention decisions the cost-aware policy makes; they are not intended to represent all cache workloads.
 
 ## Run it
 
@@ -42,7 +42,7 @@ Defaults are 100,000 operations, a 256 KiB logical budget, seven measured trials
 | `skewed-expensive-reuse` | Access is concentrated on a small head of the key distribution, and that head carries substantially higher recomputation cost. Entry sizes also vary.                                                                       |
 | `byte-pressure`          | Small, expensive entries compete for a fixed budget with much larger, cheap entries. This tests whether retention value is considered relative to occupied bytes.                                                           |
 
-These are targeted workloads, not claims about every cache deployment. Their cost and size distributions are chosen to expose the decisions Cachewise was built to make. Phase-transition and uniform-access cases are left out of the headline benchmark: they do not directly test the cost/size retention advantage and can obscure the primary objective.
+These workloads isolate specific access-pattern and size/cost combinations. They should be treated as controlled comparisons, not representative traces. Uniform access and phase-transition workloads are not included in this benchmark set, so the results do not establish how either policy behaves across those patterns.
 
 ## Metrics
 
@@ -57,11 +57,26 @@ The output reports the median across measured trials and the 25th/75th percentil
 
 The benchmark does not execute the expensive computation represented by `computeCost`; it treats that value as a relative weight. It measures cache-policy overhead as well as retention outcomes. Throughput matters because a retention improvement that costs more CPU than the saved recomputation may not be useful for a particular application.
 
+## Recorded results
+
+The checked-in report records one run on Node.js 26.13.0 and an Apple M4 Max, using 100,000 operations per trial, a 256 KiB logical budget, seven measured trials, and two warm-ups. The table reports medians across measured trials.
+
+| Workload                 | Policy     | Weighted hit ratio | Raw hit ratio | Operations/sec | Batch p95 (µs) |
+| ------------------------ | ---------- | -----------------: | ------------: | -------------: | -------------: |
+| `scan-pollution`         | LRU        |             63.84% |        38.47% |      1,027,011 |          1.113 |
+| `scan-pollution`         | Cost-aware |             99.02% |        59.67% |        965,913 |          1.187 |
+| `skewed-expensive-reuse` | LRU        |             58.93% |        29.61% |        872,136 |          1.232 |
+| `skewed-expensive-reuse` | Cost-aware |             91.69% |        40.42% |        804,940 |          1.336 |
+| `byte-pressure`          | LRU        |             80.94% |        61.78% |      1,087,057 |          1.030 |
+| `byte-pressure`          | Cost-aware |             99.44% |        75.20% |      1,874,774 |          0.584 |
+
+In this run, cost-aware retention increased weighted hit ratio in all three selected workloads. It also had lower measured throughput in the first two workloads and higher throughput in `byte-pressure`. These are results from this specific benchmark run, not a general performance guarantee. The benchmark does not execute the recomputation represented by the weights, so a higher weighted hit ratio cannot be translated directly into application latency or CPU savings. The raw observations and environment metadata are in [`report.json`](../packages/cachewise/benchmark-results/report.json), with a compact version in [`report.md`](../packages/cachewise/benchmark-results/report.md).
+
 ## Interpreting results
 
 Start with weighted hit ratio and avoided cost. Then look at throughput and batch latency to understand the overhead required to achieve that retention. A higher raw hit ratio is not necessarily better if the cache is hitting on cheap values while missing expensive ones.
 
-The benchmark is not a universal winner-takes-all score. The useful question is whether the workload resembles the target application and whether the additional cache-side CPU cost is smaller than the recomputation cost it avoids.
+The benchmark is not a universal winner-takes-all score. The relevant question is whether the workload resembles the target application and whether the cache-side CPU cost is justified by the recomputation it avoids. Because the benchmark does not run the underlying computation, that final trade-off must be measured in the application.
 
 ## Limitations
 

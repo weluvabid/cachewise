@@ -2,23 +2,11 @@ import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
-import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 
 export default [
-  { ignores: ['**/dist/**', '**/coverage/**', '**/.svelte-kit/**', 'pnpm-lock.yaml'] },
+  { ignores: ['**/dist/**', '**/coverage/**', 'pnpm-lock.yaml'] },
   js.configs.recommended,
-  ...svelte.configs['flat/recommended'],
-  {
-    files: ['**/*.svelte'],
-    languageOptions: {
-      globals: { ...globals.browser, ...globals.node },
-      parserOptions: {
-        parser: tsParser,
-        extraFileExtensions: ['.svelte'],
-      },
-    },
-  },
   {
     files: ['**/*.{ts,tsx,mts,cts}'],
     languageOptions: {

@@ -1,8 +1,8 @@
 # Architecture
 
-Cachewise keeps the public API small and splits the work behind it into a few focused pieces.
+The `Cache` class owns retained entries and coordinates policy, accounting, frequency tracking, and asynchronous computation. The components are separated by responsibility; they are not independent services or background workers.
 
-## Runtime path
+## Runtime components
 
 `Cache<K, V>` owns the entries and coordinates the other components:
 
@@ -12,7 +12,7 @@ Cachewise keeps the public API small and splits the work behind it into a few fo
 - The admission check decides whether a candidate is worth keeping instead of that victim
 - In-flight computation state deduplicates concurrent `getOrCompute` calls for the same key
 
-The current implementation is synchronous except for `getOrCompute`. There is no background worker, timer, or automatic maintenance loop. Expiration is checked when an entry is accessed or during an explicit prune.
+Cache operations are synchronous except for the promise-based `getOrCompute` path. There is no background worker, expiry timer, or maintenance loop. Expiration is checked on access or during an explicit call to `pruneExpired()`.
 
 ## Insert and admission path
 
@@ -25,7 +25,7 @@ A call to `set` follows this sequence:
 5. Under capacity pressure, build one policy snapshot and order potential victims once. The candidate is checked against every victim needed to free enough bytes.
 6. Only after the complete plan passes admission are victims removed and the candidate inserted.
 
-Capacity-pressure planning is read-only until the full victim set passes admission. A rejected candidate therefore does not evict entries as a side effect of the attempt.
+Planning under capacity pressure does not mutate resident entries. Cachewise removes victims only after the complete plan passes admission, so a rejected candidate leaves the existing entries unchanged.
 
 A replacement is treated as a new candidate: the previous value is excluded from the capacity calculation and is disposed only after the replacement has passed admission.
 
@@ -35,7 +35,7 @@ The `lru` policy selects the entry with the smallest `lastAccessedAt` timestamp 
 
 The default `cost-aware` policy selects the lowest-scoring entry and admits a candidate only when its score is positive and at least as high as the selected victim's score. The score is described in [Eviction and admission](./eviction-and-admission.md).
 
-Both policies scan a temporary candidate list when an insertion needs space. A single-victim insertion uses one linear scan; multi-victim insertion sorts once to establish victim order. Cachewise does not maintain a linked-list LRU structure or a heap of cost scores.
+Both policies scan resident entries when an insertion needs space. Selecting one victim requires a linear scan; selecting multiple victims requires sorting the candidates once. The implementation does not maintain a linked-list LRU structure or a heap of precomputed cost scores.
 
 ## Frequency tracking
 
@@ -54,6 +54,8 @@ An invalidation flag on each active flight and a cache-wide epoch prevent a fact
 See [Concurrency](./concurrency.md) for the lifecycle and edge cases.
 
 ## Complexity
+
+The bounds below describe cache-side work and exclude user callbacks, factory execution, and runtime scheduling.
 
 Let `n` be the number of retained entries and `v` the number of victims needed for an insertion.
 

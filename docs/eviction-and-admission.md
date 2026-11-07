@@ -1,6 +1,6 @@
 # Eviction and admission
 
-Cachewise tries to keep entries that are likely to avoid more recomputation relative to the logical space they occupy.
+The cost-aware policy ranks entries by estimated reuse value relative to their logical size. When capacity is constrained, it uses those scores to choose which entries to retain and whether a new candidate should be admitted.
 
 ## Cost-aware score
 
@@ -46,9 +46,9 @@ When a candidate needs multiple victims to fit, it must pass the admission compa
 
 The LRU policy always admits after space has been made, which makes it a useful baseline for the same storage budget.
 
-## What the score does not claim
+## Limits of the score
 
-This is a heuristic, not an optimal cache policy. It does not know the real future request stream, the actual CPU cost of a computation, object-graph size, GC pressure, or the downstream value of a cached result.
+The score is a heuristic, not an optimal cache policy. It has no knowledge of future requests, measured computation time, object-graph size, garbage-collection pressure, or the downstream value of a cached result.
 
 The logarithms damp high frequency and high compute-cost inputs. Division by size rewards compact entries. The half-life makes stale reuse matter less over time. Those are design choices, not a proof of universally optimal retention.
 

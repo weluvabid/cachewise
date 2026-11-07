@@ -1,8 +1,8 @@
 # Cachewise
 
-In-memory TypeScript cache with a logical byte budget and a cost-aware admission/eviction policy. Also provides an LRU baseline, TTL, async single-flight computation, cancellation, invalidation, disposal hooks, and statistics.
+Cachewise is a TypeScript in-memory cache with a logical byte budget, cost-aware admission and eviction, and an LRU baseline. It also supports TTL, per-key single-flight computation, per-caller cancellation, invalidation, disposal callbacks, and statistics.
 
-The workspace-level [README](../../README.md) has the project overview and quick example.
+The workspace [README](../../README.md) contains the overview and quick-start example.
 
 ## Documentation
 
@@ -20,9 +20,10 @@ From the workspace root:
 
 ```sh
 pnpm install
-pnpm --filter cachewise test
-pnpm --filter cachewise build
+pnpm check
 pnpm --filter cachewise benchmark
 ```
 
-The package currently exports ESM and requires Node.js 24 or newer.
+The benchmark command builds the package before running the deterministic workload suite. See the benchmarking guide for its metrics and limitations.
+
+The package publishes ESM and requires Node.js 24 or later.

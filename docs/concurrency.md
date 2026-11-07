@@ -1,6 +1,6 @@
 # Concurrency and async computation
 
-JavaScript execution is single-threaded within a given agent, but asynchronous factories can overlap. Cachewise uses single-flight coordination to avoid starting duplicate factories for the same key.
+A JavaScript agent executes one synchronous task at a time, but asynchronous factories can remain pending concurrently. Cachewise uses single-flight coordination so callers requesting the same key can share one factory execution.
 
 ## Single-flight lifecycle
 
@@ -15,9 +15,9 @@ For `getOrCompute(key, factory, options)`:
 
 The factory receives the shared signal, not any caller's signal.
 
-## Cancellation is cooperative
+## Cancellation semantics
 
-Aborting an `AbortSignal` is a notification. It cannot forcibly stop arbitrary JavaScript work. A factory must observe the signal and stop its own work if it can.
+An `AbortSignal` communicates a cancellation request; it cannot forcibly stop arbitrary JavaScript work. A factory must observe the signal and cooperate with cancellation.
 
 If a caller cancels, that caller rejects with an `AbortError`. Other callers continue waiting. If every caller leaves, Cachewise aborts the shared signal. A factory that ignores the signal may continue running, and its promise may still settle later.
 
@@ -29,7 +29,7 @@ A factory's eventual result is returned to callers that are still awaiting it. I
 
 `clear()` increments a cache-wide epoch, aborts known flights, clears the flight map, and removes retained entries. A factory that settles after the clear sees an old epoch and cannot repopulate the cache.
 
-These checks protect cache state. They do not cancel external side effects already performed by a factory.
+These checks protect cache state. They do not roll back external side effects that a factory has already performed.
 
 ## Undefined values
 
@@ -43,4 +43,4 @@ Exceptions thrown by `onDispose` and `onEvent` are caught so they cannot interru
 
 ## Scope
 
-The cache is not a cross-worker or distributed coordination mechanism. Separate `Cache` instances do not share entries or in-flight computations. There is no cross-process locking or persistence.
+Single-flight coordination applies only within one `Cache` instance in one JavaScript agent. Separate instances do not share entries or in-flight computations. Cachewise provides no cross-worker coordination, cross-process locking, or persistence.

@@ -7,7 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "build": "pnpm --filter cachewise build && pnpm --filter @cachewise/demo build",
+    "build": "pnpm --filter cachewise build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -26,12 +26,10 @@
     "@typescript-eslint/eslint-plugin": "^8.46.0",
     "@typescript-eslint/parser": "^8.46.0",
     "eslint": "^9.39.0",
-    "eslint-plugin-svelte": "^3.13.0",
     "fast-check": "^4.3.0",
     "globals": "^16.5.0",
     "lint-staged": "^16.2.0",
     "prettier": "^3.6.2",
-    "prettier-plugin-svelte": "^3.4.0",
     "publint": "^0.3.15",
     "@arethetypeswrong/cli": "^0.18.2",
     "simple-git-hooks": "^2.13.1",
@@ -42,8 +40,8 @@
     "@changesets/cli": "^2.29.7"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,mjs,cjs,svelte,json,md,yml,yaml,css}": "prettier --write",
-    "*.{ts,tsx,js,mjs,cjs,svelte}": "eslint --fix"
+    "*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml,css}": "prettier --write",
+    "*.{ts,tsx,js,mjs,cjs}": "eslint --fix"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged"
