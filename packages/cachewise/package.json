@@ -25,6 +25,19 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "check:package": "publint --strict && attw --pack . --profile esm-only",
-    "benchmark": "pnpm build && node benchmarks/run.mjs"
+    "benchmark": "pnpm build && node benchmarks/run.mjs",
+    "prepack": "pnpm build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weluvabid/cachewise.git",
+    "directory": "packages/cachewise"
+  },
+  "homepage": "https://github.com/weluvabid/cachewise#readme",
+  "bugs": {
+    "url": "https://github.com/weluvabid/cachewise/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
