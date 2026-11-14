@@ -39,7 +39,7 @@ These checks protect cache state. They do not roll back external side effects th
 
 `onDispose` and `onEvent` are synchronous callbacks. They run as part of the operation that emits the event or disposes the value. Keep them short and avoid blocking work.
 
-Exceptions thrown by `onDispose` and `onEvent` are caught so they cannot interrupt cache state transitions or prevent remaining cleanup. If `onCallbackError` is provided, Cachewise passes it the thrown value and the callback name (`dispose` or `event`). Exceptions thrown by the error handler are also swallowed; error reporting must not become another source of cache corruption. These callbacks remain synchronous, so keep them short and avoid blocking work.
+Exceptions thrown by `onDispose` and `onEvent` are caught so they cannot interrupt cache state transitions or prevent remaining cleanup. If `onCallbackError` is provided, Cachewise passes it the thrown value and the callback name (`dispose` or `event`). Exceptions thrown by the error handler are also swallowed; error reporting must not become another source of cache corruption.
 
 ## Scope
 

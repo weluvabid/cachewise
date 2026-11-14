@@ -1,6 +1,6 @@
 # Benchmarking
 
-The benchmark compares the cost-aware policy with LRU under deterministic request streams that vary reuse, recomputation-cost weights, and entry sizes. Both policies receive the same stream and logical capacity. The workloads are deliberately targeted at the retention decisions the cost-aware policy makes; they are not intended to represent all cache workloads.
+The benchmark compares the cost-aware policy with LRU under deterministic request streams that vary reuse, recomputation-cost weights, and entry sizes. Both policies receive the same stream and logical capacity. The workloads target the retention decisions the cost-aware policy makes; they are not intended to represent all cache workloads.
 
 ## Run it
 

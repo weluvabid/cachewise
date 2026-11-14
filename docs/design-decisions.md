@@ -10,7 +10,7 @@ Cachewise accounts for caller-estimated value sizes instead of trying to inspect
 
 The default policy combines recency, bounded reuse estimates, caller-provided recomputation cost, and logical size. LRU remains available so the same cache mechanics can be measured against a familiar baseline.
 
-The score is intentionally heuristic. It is easy to explain and deterministic for a given entry state and clock value, but it cannot predict future access patterns.
+The score is a heuristic. It is easy to explain and deterministic for a given entry state and clock value, but it cannot predict future access patterns.
 
 ## Bounded frequency state
 
